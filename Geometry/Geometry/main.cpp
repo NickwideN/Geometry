@@ -11,6 +11,7 @@ int main() {
     std::cout << c << '\n';
     std::cin >> c;
     std::cout << c << '\n';
+    c[5];
     getchar();
     getchar();
     return 0;

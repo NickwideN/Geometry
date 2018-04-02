@@ -1,3 +1,7 @@
-﻿  main.cpp
+﻿  Vector.cpp
+d:\с++\geometry\geometry\geometry\vector.cpp(74): warning C4101: error_i: неиспользованная локальная переменная
+d:\с++\geometry\geometry\geometry\vector.cpp(90): warning C4101: error_i: неиспользованная локальная переменная
+d:\с++\geometry\geometry\geometry\vector.cpp(104): warning C4101: error_i: неиспользованная локальная переменная
+d:\с++\geometry\geometry\geometry\vector.cpp(118): warning C4101: error_i: неиспользованная локальная переменная
   Geometry.vcxproj -> D:\С++\Geometry\Geometry\Debug\Geometry.exe
   Geometry.vcxproj -> D:\С++\Geometry\Geometry\Debug\Geometry.pdb (Partial PDB)

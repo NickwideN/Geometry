@@ -66,13 +66,14 @@ Vector vector_product(const Vector & vector_1, const Vector & vector_2) {
     Vector new_vector;
     try {
         if (Vector::DIMENTION != 3)
-            throw "Not able to take vector product with DIMENTION != 3. For getting an area of parallelogram on the vectors use function \"area(Vector vector1, Vector vector2)\"";
+            throw 1;
         new_vector[0] = vector_1[1] * vector_2[2] - vector_1[2] * vector_2[1];
         new_vector[1] = vector_1[0] * vector_2[2] - vector_1[2] * vector_2[0];
         new_vector[2] = vector_1[0] * vector_2[1] - vector_1[1] * vector_2[0];
     }
-    catch (char * error_str) {
-        std::cerr << error_str << std::endl;
+    catch (int error_i) {
+        std::cerr << "Error: not able to take vector product with DIMENTION != 3. For getting an area of parallelogram on the vectors use function \"area(Vector vector1, Vector vector2)\"" << std::endl;
+        getchar();
         getchar();
         std::exit(1);
     }
@@ -83,11 +84,12 @@ Vector::coordinate_t area(const Vector & vector_1, const Vector & vector_2){
     Vector::coordinate_t area = 0;
     try {
         if (Vector::DIMENTION != 2)
-            throw "Not able to take an area with DIMENTION != 2";
+            throw 2;
          area = vector_1[0] * vector_2[1] - vector_1[1] * vector_2[0];
     }
-    catch (char * error_str) {
-        std::cerr << error_str << std::endl;
+    catch (int error_i) {
+        std::cerr << "Error : not able to take an area with DIMENTION != 2" << std::endl;
+        getchar();
         getchar();
         std::exit(1);
     }
@@ -95,10 +97,30 @@ Vector::coordinate_t area(const Vector & vector_1, const Vector & vector_2){
 }
 
 Vector::coordinate_t Vector::operator[] (const int index) const{
+    try {
+        if (index >= Vector::DIMENTION)
+            throw 3;
+    }
+    catch (int error_i) {
+        std::cerr << "Error: attempt to take not exist coordinate " << index << ". DIMENTION = " << Vector::DIMENTION << std::endl;
+        getchar();
+        getchar();
+        std::exit(1);
+    }
     return this->coordinates[index];
 }
 
 Vector::coordinate_t & Vector::operator[] (const int index) {
+    try {
+        if (index >= Vector::DIMENTION)
+            throw 4;
+    }
+    catch (int error_i) {
+        std::cerr << "Error: attempt to change not exist coordinate " << index << ". DIMENTION = " << Vector::DIMENTION << std::endl;
+        getchar();
+        getchar();
+        std::exit(1);
+    }
     return this->coordinates[index];
 }
 

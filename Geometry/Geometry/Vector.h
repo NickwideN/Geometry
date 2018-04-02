@@ -34,7 +34,7 @@ public:
     friend std::ostream & operator << (std::ostream & os, const Vector & vector);
     friend std::istream & operator >> (std::istream & is, Vector & vector);
 };
-#endif // !_NickwideN_Vector_H
+
 
 template<typename user_t>
 inline Vector::Vector(const user_t coor_0, const user_t coor_1, const user_t coor_2, const user_t coor_3, ...){ 
@@ -46,3 +46,4 @@ inline Vector::Vector(const user_t coor_0, const user_t coor_1, const user_t coo
     }
 }
 
+#endif // !_NickwideN_Vector_H
