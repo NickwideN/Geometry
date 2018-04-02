@@ -45,3 +45,4 @@ inline Vector::Vector(const user_t coor_0, const user_t coor_1, const user_t coo
         ++pointer_coor;
     }
 }
+
