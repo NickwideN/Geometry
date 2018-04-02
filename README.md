@@ -53,7 +53,7 @@ Vector(const coordinate_t coor_0, const coordinate_t coor_1 = default_value, con
 ```c++
     friend coordinate_t area(const Vector & vector_1, const Vector & vector_2);
 ```
-area(vector_1, vector_2); возвращает площадь параллелограмма, основанного на векторах 1 и 2. Реализована только для двумерного простронства. В иных случаях вызывается исключение с выходом из программы.
+area(vector_1, vector_2); возвращает площадь параллелограмма, основанного на векторах 1 и 2. Реализована только для двумерного пространства. В иных случаях вызывается исключение с выходом из программы.
 ```c++
     coordinate_t operator [] (const int index) const;
     coordinate_t & operator [] (const int index);
