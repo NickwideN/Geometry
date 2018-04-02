@@ -13,8 +13,8 @@ double f(double n, ...)    //--заголовок с переменным числом параметров
 }
 
 int main() {
-    Vector a();
-    Vector b(1.0, 2.2);
+    Vector a;
+    Vector b(1.1,2.0);
     double u = f(4.0, 4, 7, 6, 4);
 }
 
