@@ -103,6 +103,7 @@ inline void error(T1 p1, T2 p2, T3 p3, T4 p4) {
     std::exit(1);
 }
 
+
 template<typename Segment>
 Segment Segment::move(const Vector & vector) {
     this->point_1.move(vector);
