@@ -112,10 +112,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Vector.cpp" />
+    <ClCompile Include="Geometry.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Vector.h" />
+    <ClInclude Include="Geometry.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

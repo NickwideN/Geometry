@@ -1,4 +1,4 @@
-#include"Vector.h"
+#include"Geometry.h"
 #include<iostream>
 int main() {
     Vector a;
@@ -10,7 +10,7 @@ int main() {
     Vector c(-1, -1);
     std::cout << c << '\n';
     std::cout << agl(c, a) << '\n';
-    c[5];
+    c[1];
     getchar();
     getchar();
     return 0;
