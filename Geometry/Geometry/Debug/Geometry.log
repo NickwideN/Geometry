@@ -1,3 +1,19 @@
 ﻿  main.cpp
-  Geometry.vcxproj -> D:\С++\Geometry\Geometry\Debug\Geometry.exe
-  Geometry.vcxproj -> D:\С++\Geometry\Geometry\Debug\Geometry.pdb (Partial PDB)
+d:\с++\geometry\geometry\geometry\geometry.h(53): error C4430: отсутствует спецификатор типа - предполагается int. Примечание. C++ не поддерживает int по умолчанию
+d:\с++\geometry\geometry\geometry\geometry.h(53): error C2143: синтаксическая ошибка: отсутствие "," перед "&"
+d:\с++\geometry\geometry\geometry\geometry.h(54): error C4430: отсутствует спецификатор типа - предполагается int. Примечание. C++ не поддерживает int по умолчанию
+d:\с++\geometry\geometry\geometry\geometry.h(54): error C2143: синтаксическая ошибка: отсутствие "," перед "&"
+d:\с++\geometry\geometry\geometry\geometry.h(78): error C3668: Segment::has_point: метод со спецификатором переопределения "override" не переопределяет какие-либо методы базового класса
+d:\с++\geometry\geometry\geometry\geometry.h(79): error C3668: Segment::has_intarsection_with: метод со спецификатором переопределения "override" не переопределяет какие-либо методы базового класса
+d:\с++\geometry\geometry\geometry\geometry.h(107): error C2063: move: не является функцией
+d:\с++\geometry\geometry\geometry\geometry.h(107): error C2447: {: отсутствует заголовок функции (возможно, используется формальный список старого типа)
+  Geometry.cpp
+d:\с++\geometry\geometry\geometry\geometry.h(53): error C4430: отсутствует спецификатор типа - предполагается int. Примечание. C++ не поддерживает int по умолчанию
+d:\с++\geometry\geometry\geometry\geometry.h(53): error C2143: синтаксическая ошибка: отсутствие "," перед "&"
+d:\с++\geometry\geometry\geometry\geometry.h(54): error C4430: отсутствует спецификатор типа - предполагается int. Примечание. C++ не поддерживает int по умолчанию
+d:\с++\geometry\geometry\geometry\geometry.h(54): error C2143: синтаксическая ошибка: отсутствие "," перед "&"
+d:\с++\geometry\geometry\geometry\geometry.h(78): error C3668: Segment::has_point: метод со спецификатором переопределения "override" не переопределяет какие-либо методы базового класса
+d:\с++\geometry\geometry\geometry\geometry.h(79): error C3668: Segment::has_intarsection_with: метод со спецификатором переопределения "override" не переопределяет какие-либо методы базового класса
+d:\с++\geometry\geometry\geometry\geometry.h(107): error C2063: move: не является функцией
+d:\с++\geometry\geometry\geometry\geometry.h(107): error C2447: {: отсутствует заголовок функции (возможно, используется формальный список старого типа)
+  Создание кода...

@@ -11,6 +11,9 @@ int main() {
     std::cout << c << '\n';
     std::cout << agl(c, a) << '\n';
     c[1];
+    Point p;
+    std::cout << p;
+    p.move(c);
     getchar();
     getchar();
     return 0;

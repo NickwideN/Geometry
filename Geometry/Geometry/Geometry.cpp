@@ -106,17 +106,52 @@ double agl(const Vector & vector_1, const Vector & vector_2){
 
 
 std::ostream & operator<<(std::ostream & os, const Vector & vector){
-    std::cout << '(';
+    os << '(';
     for (int i = 0; i < Vector::DIMENTION - 1; ++i)
-        std::cout << vector.coordinates[i] << ", ";
-    std::cout << vector.coordinates[Vector::DIMENTION - 1] << ')';
+        os << vector.coordinates[i] << ", ";
+    os << vector.coordinates[Vector::DIMENTION - 1] << ')';
     return os;
 }
 
 std::istream & operator>>(std::istream & is, Vector & vector){
     for (int i = 0; i < Vector::DIMENTION; ++i)
-        std::cin >> vector.coordinates[i];
+        is >> vector.coordinates[i];
     return is;
 }
 
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//Class Point {};
+
+Point::Point(): 
+    radius_vector() {}
+
+Point::Point(coordinate_t coor_0, coordinate_t coor_1):
+    radius_vector(coor_0, coor_1){}
+
+Point & Point::move(const Vector & vector){
+    this->radius_vector += vector;
+    return *this;
+}
+
+std::ostream & operator<<(std::ostream & os, const Point & point){
+    os << point.radius_vector;
+    return os;
+}
+
+std::istream & operator>>(std::istream & is, Point & point){
+    is >> point.radius_vector;
+    return is;
+}
+
+
+bool Segment::has_point(const Point & point) const
+{
+    return false;
+}
+
+bool Segment::has_intarsection_with(const Segment & segment) const
+{
+    return false;
+}
 
