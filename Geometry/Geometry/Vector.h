@@ -7,7 +7,11 @@ private:
     typedef double coordinate_t;
     coordinate_t coordinates[DIMENTION];
     constexpr static coordinate_t default_value = 0;
+
+    template <typename T1 = const char *, typename T2 = const char *, typename T3 = const char *, typename T4 = const char *>
+    friend void error(T1 p1, T2 p2 = "", T3 p3 = "", T4 p4 = "");
 public:
+    
     Vector();
     template<typename user_t>
     Vector(const user_t coor_0, const user_t coor_1, const user_t coor_2, const user_t coor_3, ...); 
@@ -35,7 +39,6 @@ public:
     friend std::istream & operator >> (std::istream & is, Vector & vector);
 };
 
-
 template<typename user_t>
 inline Vector::Vector(const user_t coor_0, const user_t coor_1, const user_t coor_2, const user_t coor_3, ...){ 
                                         //doesn't have a cheking if it inputs number of coors that less than DIMENTION
@@ -44,6 +47,14 @@ inline Vector::Vector(const user_t coor_0, const user_t coor_1, const user_t coo
         coordinates[i] = *pointer_coor;
         ++pointer_coor;
     }
+}
+
+template<typename T1, typename T2, typename T3, typename T4>
+inline void error(T1 p1, T2 p2, T3 p3, T4 p4){
+    std::cerr << "Error: " << p1  << p2 << p3 << p4 << '\n';
+    getchar();
+    getchar();
+    std::exit(1);
 }
 
 #endif // !_NickwideN_Vector_H

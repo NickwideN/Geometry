@@ -3,14 +3,13 @@
 int main() {
     Vector a;
     Vector b(4, 3);
-    a = b;
+    a = Vector(1, 1);
     b = a + b;
     b = a + Vector(2, 4);
     std::cout << area(Vector(6, 3), b) << std::endl;
-    Vector c(4, 5);
+    Vector c(-1, -1);
     std::cout << c << '\n';
-    std::cin >> c;
-    std::cout << c << '\n';
+    std::cout << agl(c, a) << '\n';
     c[5];
     getchar();
     getchar();
