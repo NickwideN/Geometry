@@ -1,7 +1,7 @@
 #ifndef _NickwideN_Geometry_H
 #define _NickwideN_Geometry_H
 #include<iostream>
-#include<list>
+#include<deque>
 //-------------------------------------------------------------------------------------------------
 //                          README.md here: https://github.com/NickwideN/Geometry
 //-------------------------------------------------------------------------------------------------
@@ -129,7 +129,7 @@ namespace Geometry {
 
     class Polygon : public Shape {
     private:
-        std::list<Point> points;
+        std::deque<Point> points;
     public:
         // проверка на непересечение сторон полигона
         Polygon();
