@@ -55,10 +55,18 @@ Geometry::Vector & Geometry::Vector::operator *= (const coordinate_t & coefficie
     return *this;
 }
 
-
 Geometry::Vector Geometry::operator * (const Vector & vector, const coordinate_t & coefficient) {
     Geometry::Vector new_vector(vector);
     return new_vector *= coefficient;
+}
+
+Geometry::Vector & Geometry::Vector::operator /= (const coordinate_t & coefficient){
+    return *this *= 1 / coefficient;
+}
+
+Geometry::Vector Geometry::operator / (const Vector & vector, const coordinate_t & coefficient){
+    Vector new_vector(vector);
+    return new_vector /= coefficient;
 }
 
 Geometry::coordinate_t Geometry::operator * (const Vector & vector_1, const Vector & vector_2){
@@ -85,9 +93,7 @@ Geometry::Vector Geometry::vector_product(const Geometry::Vector & vector_1, con
 Geometry::coordinate_t Geometry::skew_product(const Geometry::Vector & vector_1, const Geometry::Vector & vector_2){
     if (Geometry::DIMENTION != 2)
         Geometry::error("Error : not able to take an area with DIMENTION != 2");
-    Geometry::coordinate_t area = 0;
-    area = vector_1[0] * vector_2[1] - vector_1[1] * vector_2[0];
-    return area;
+    return vector_1[0] * vector_2[1] - vector_1[1] * vector_2[0];;
 }
 
 Geometry::coordinate_t Geometry::Vector::operator[] (const int index) const{
@@ -188,12 +194,23 @@ std::istream & Geometry::operator>>(std::istream & is, Geometry::Point & point){
     return is;
 }
 
-Geometry::Vector Geometry::Point::get_radius_vector() {
+Geometry::Vector Geometry::Point::get_radius_vector() const {
     return this->radius_vector;
 }
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //Class Segment: public Shape {};
+
+Geometry::Segment::Segment()
+    : point_1(), point_2() {}
+
+Geometry::Segment::Segment(const Point & point_1, const Point & point_2)
+    : point_1(point_1), point_2(point_2) {}
+
+Geometry::Segment::Segment(const Point & origen, const Vector & direction, const coordinate_t & length)
+    : point_1(origen) {
+    //this->point_2 = point
+}
 
 Geometry::Segment & Geometry::Segment::move(const Geometry::Vector & vector){
     this->point_1.move(vector);
@@ -202,20 +219,9 @@ Geometry::Segment & Geometry::Segment::move(const Geometry::Vector & vector){
 }
 
 bool Geometry::Segment::has_point(const Point & point) const{
-    bool this_segment_has_point = true;
-    //Check, has Line(point_1, point_2) the point
-    if (!Geometry::are_collinear(this->point_1.get_radius_vector - this->point_2.get_radius_vector, \
-                                 this->point_1.get_radius_vector - point.get_radius_vector)) {
-        this_segment_has_point = false;
-    }
-    //Check, has a rectangle with point_1 and point_2 in opposite angles
-    for (int i = 0; i < DIMENTION; ++i) {
-        if (!((std::min())) {
-            this_segment_has_point = false;
-        }
-    }
-
-    return this_segment_has_point;
+    return (std::abs(skew_product(this->point_1.get_radius_vector(), point.get_radius_vector())) + \
+                std::abs(skew_product(point.get_radius_vector(), this->point_2.get_radius_vector())) == \
+                    std::abs(skew_product(this->point_1.get_radius_vector(), this->point_2.get_radius_vector())));
 }
 
 bool Geometry::Segment::has_intarsection_with(const Segment & segment) const

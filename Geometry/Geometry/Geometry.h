@@ -31,7 +31,9 @@ namespace Geometry {
         Vector operator + () const;
         Vector operator - () const;
         Vector & operator *= (const coordinate_t & coefficient);
+        Vector & operator /= (const coordinate_t & coefficient);
         friend Vector operator * (const Vector & vector, const coordinate_t & coefficient);
+        friend Vector operator / (const Vector & vector, const coordinate_t & coefficient);
         friend coordinate_t operator * (const Vector & vector_1, const Vector & vector_2);
         friend coordinate_t scalar_product(const Vector & vector_1, const Vector & vector_2);
         friend Vector vector_product(const Vector & vector_1, const Vector & vector_2);
@@ -58,7 +60,6 @@ namespace Geometry {
         virtual Shape & move(const Vector & vector) = 0;
         virtual bool has_point(const Point & point) const = 0;
         virtual bool has_intarsection_with(const Segment & segment) const = 0;
-
     };
 
     class Point: public Shape {
@@ -66,13 +67,14 @@ namespace Geometry {
         Vector radius_vector;
     public:
         Point();
-        Point(coordinate_t coor_0, coordinate_t coor_1); ///////////////////////////////////////////
+        Point(const coordinate_t & coor_0, const coordinate_t & coor_1); ///////////////////////////////////////////
+        Point(const Vector ragius_vector);
         Point & move(const Vector & vector) override;
         bool has_point(const Point & point) const override;
         bool has_intarsection_with(const Segment & segment) const override;
         friend std::ostream & operator << (std::ostream & os, const Point & vector);
         friend std::istream & operator >> (std::istream & is, Point & vector);
-        Vector get_radius_vector();
+        Vector get_radius_vector() const;
     };
 
     class Segment: public Shape {
@@ -80,7 +82,9 @@ namespace Geometry {
         Point point_1;
         Point point_2;
     public:
-        //Конструкторы
+        Segment();
+        Segment(const Point & point_1, const Point & point_2);
+        Segment(const Point & origen, const Vector & direction, const coordinate_t & length);
         Segment & move(const Vector & vector) override;
         virtual bool has_point(const Point & point) const override;
         virtual bool has_intarsection_with(const Segment & segment) const override;
