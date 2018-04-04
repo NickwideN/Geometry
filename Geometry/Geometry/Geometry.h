@@ -5,12 +5,15 @@
 //-------------------------------------------------------------------------------------------------
 //                          README.md here: https://github.com/NickwideN/Geometry
 //-------------------------------------------------------------------------------------------------
+
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!добавь все конструкторы и операции = !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 namespace Geometry {
     typedef double coordinate_t;
     const static int DIMENTION = 2;
     constexpr static coordinate_t default_value = 0;
     class Point;
     class Segment;
+    class Line;
     class Vector {
     private:
         coordinate_t coordinates[DIMENTION];
@@ -69,15 +72,17 @@ namespace Geometry {
         Vector radius_vector;
     public:
         Point();
-        Point(const coordinate_t & coor_0, const coordinate_t & coor_1 = default_value); // no konstruktors for Demention > 2
+        Point(const coordinate_t & coor_0, const coordinate_t & coor_1 = default_value); // no konstruktors for Demention > 2//////////////////
         Point(const Vector ragius_vector);
-        //operator =
         Point & move(const Vector & vector) override;
         bool has_point(const Point & point) const override;
         bool has_intarsection_with(const Segment & segment) const override;
         friend std::ostream & operator << (std::ostream & os, const Point & vector);
         friend std::istream & operator >> (std::istream & is, Point & vector);
         Vector get_radius_vector() const;
+
+        friend class Segment;
+        friend class Line;
     };
 
     class Segment : public Shape {
@@ -94,10 +99,11 @@ namespace Geometry {
         virtual bool has_intarsection_with(const Segment & segment) const override;///////////////////////////////////////////
         friend coordinate_t length(const Segment & segment);
 
-        
-
         friend std::ostream & operator << (std::ostream & os, const Segment & segment);
         friend std::istream & operator >> (std::istream & is, Segment & segmant);
+
+        Point get_point_0() const;
+        Point get_point_1() const;
     };
 
     class Line : public Shape {

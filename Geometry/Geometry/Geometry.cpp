@@ -89,7 +89,7 @@ Geometry::Vector Geometry::vector_product(const Vector & vector_0, const Vector 
         error("Error: not able to take vector product with DIMENTION != 3. For getting an area of parallelogram on the vectors use function \"skew_product(Vector vector1, Vector vector2)\"");
     Vector new_vector;
     new_vector[0] = vector_0[1] * vector_1[2] - vector_0[2] * vector_1[1];
-    new_vector[1] = vector_0[0] * vector_1[2] - vector_0[2] * vector_1[0];
+    new_vector[1] = -vector_0[0] * vector_1[2] + vector_0[2] * vector_1[0];
     new_vector[2] = vector_0[0] * vector_1[1] - vector_0[1] * vector_1[0];
     return new_vector;
 }
@@ -175,13 +175,16 @@ std::istream & Geometry::operator >> (std::istream & is, Vector & vector) {
 //Class Point: public Shape {};
 
 Geometry::Point::Point() :
-    radius_vector() {}
+    radius_vector() {
+}
 
 Geometry::Point::Point(const coordinate_t & coor_0, const coordinate_t & coor_1) :
-    radius_vector(coor_0, coor_1) {}
+    radius_vector(coor_0, coor_1) {
+}
 
 Geometry::Point::Point(const Vector ragius_vector) :
-    radius_vector(radius_vector) {}
+    radius_vector(radius_vector) {
+}
 
 Geometry::Point & Geometry::Point::move(const Vector & vector){
     this->radius_vector += vector;
@@ -213,11 +216,13 @@ Geometry::Vector Geometry::Point::get_radius_vector() const {
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //Class Segment: public Shape {};
 
-Geometry::Segment::Segment()
-    : point_0(), point_1() {}
+Geometry::Segment::Segment() :
+    point_0(), point_1() {
+}
 
-Geometry::Segment::Segment(const Point & point_0, const Point & point_1)
-    : point_0(point_0), point_1(point_1) {}
+Geometry::Segment::Segment(const Point & point_0, const Point & point_1) :
+    point_0(point_0), point_1(point_1) {
+}
 
 Geometry::Segment::Segment(const Point & origen, const Vector & direction, const coordinate_t & length)
     : point_0(origen) {
@@ -237,12 +242,25 @@ bool Geometry::Segment::has_point(const Point & point) const{
 }
 
 bool Geometry::Segment::has_intarsection_with(const Segment & segment) const{
-    return false;/////////////////////////////////////////////////////////////////////////////////////////////////////////
+    return Line(*this).has_intarsection_with(segment) && Line(segment).has_intarsection_with(*this);
 }
 
+Geometry::Point Geometry::Segment::get_point_0() const{
+    return this->point_0;
+}
+
+Geometry::Point Geometry::Segment::get_point_1() const {
+    return this->point_1;
+}
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //Class Line: public Shape {};
+
+Geometry::Line::Line(const Segment & segment) :
+    origen(segment.get_point_0()),
+    direction(Vector(segment.get_point_0(), segment.get_point_1())) {
+}
+
 Geometry::Line & Geometry::Line::move(const Vector & vector){
     this->origen.move(vector);
     return *this;
@@ -253,9 +271,11 @@ bool Geometry::Line::has_point(const Point & point) const {
 }
 
 bool Geometry::Line::has_intarsection_with(const Segment & segment) const {
-
-    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-    return false;
+    if (are_skew(*this, Line(segment)))
+        return false;
+    coordinate_t area_0 = skew_product(segment.get_point_0().get_radius_vector(), this->direction);
+    coordinate_t area_1 = skew_product(segment.get_point_1().get_radius_vector(), this->direction);
+    return area_0 * area_1 <= 0;
 }
 
 bool Geometry::are_coincident(const Line & line_0, const Line & line_1) {
