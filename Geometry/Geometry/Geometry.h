@@ -25,6 +25,7 @@ namespace Geometry {
         //doesn't have a cheking if number of coors is less than DIMENTION
         Vector(const coordinate_t coor_0, const coordinate_t coor_1 = default_value, const coordinate_t coor_2 = default_value);
         //let to pass several types
+        Vector(const Point & point_0, const Point & point_1);
         Vector & operator += (const Vector & vector);
         friend Vector operator + (const Vector & vector_0, const Vector & vector_1);
         Vector & operator -= (const Vector & vector);
@@ -88,16 +89,20 @@ namespace Geometry {
         Segment(const Point & point_0, const Point & point_1);
         Segment(const Point & origen, const Vector & direction, const coordinate_t & length);
         Segment & move(const Vector & vector) override;
+
         virtual bool has_point(const Point & point) const override;
         virtual bool has_intarsection_with(const Segment & segment) const override;///////////////////////////////////////////
         friend coordinate_t length(const Segment & segment);
+
+        
+
         friend std::ostream & operator << (std::ostream & os, const Segment & segment);
         friend std::istream & operator >> (std::istream & is, Segment & segmant);
     };
 
     class Line : public Shape {
     private:
-        Point point_0;
+        Point origen;
         Vector direction;
     public:
         Line(const Point & point_0, const Point & point_1);
@@ -108,6 +113,11 @@ namespace Geometry {
         Line & move(const Vector & vector) override;
         bool has_point(const Point & point) const override;
         bool has_intarsection_with(const Segment & segment) const override;
+
+        friend bool are_coincident(const Line & line_0, const Line & line_1);
+        friend bool are_parallel(const Line & line_0, const Line & line_1);
+        friend bool are_intersecting(const Line & line_0, const Line & line_1);
+        friend bool are_skew(const Line & line_0, const Line & line_1);
 
         friend std::ostream & operator << (std::ostream & os, const Line & line);
         friend std::istream & operator >> (std::istream & is, Line & line);

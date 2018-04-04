@@ -18,6 +18,10 @@ Geometry::Vector::Vector(const coordinate_t coor_0, const coordinate_t coor_1, c
     }
 }
 
+Geometry::Vector::Vector(const Point & point_0, const Point & point_1) {
+    *this = point_1.get_radius_vector() - point_0.get_radius_vector();
+}
+
 Geometry::Vector & Geometry::Vector::operator+=(const Vector & vector) {
     for (int i = 0; i < DIMENTION; ++i)
         this->coordinates[i] += vector.coordinates[i];
@@ -73,86 +77,72 @@ Geometry::coordinate_t Geometry::operator * (const Vector & vector_0, const Vect
     return scalar_product(vector_0, vector_1);
 }
 
-Geometry::coordinate_t Geometry::scalar_product(const Geometry::Vector & vector_0, const Geometry::Vector & vector_1){
+Geometry::coordinate_t Geometry::scalar_product(const Vector & vector_0, const Vector & vector_1){
     Geometry::coordinate_t result(0);
-    for (int i = 0; i < Geometry::DIMENTION; ++i)
+    for (int i = 0; i < DIMENTION; ++i)
         result += vector_0[i] * vector_1[i];
     return result;
 }
 
-Geometry::Vector Geometry::vector_product(const Geometry::Vector & vector_0, const Geometry::Vector & vector_1) {
-    if (Geometry::DIMENTION != 3)
-        Geometry::error("Error: not able to take vector product with DIMENTION != 3. For getting an area of parallelogram on the vectors use function \"skew_product(Vector vector1, Vector vector2)\"");
-    Geometry::Vector new_vector;
+Geometry::Vector Geometry::vector_product(const Vector & vector_0, const Vector & vector_1) {
+    if (DIMENTION != 3)
+        error("Error: not able to take vector product with DIMENTION != 3. For getting an area of parallelogram on the vectors use function \"skew_product(Vector vector1, Vector vector2)\"");
+    Vector new_vector;
     new_vector[0] = vector_0[1] * vector_1[2] - vector_0[2] * vector_1[1];
     new_vector[1] = vector_0[0] * vector_1[2] - vector_0[2] * vector_1[0];
     new_vector[2] = vector_0[0] * vector_1[1] - vector_0[1] * vector_1[0];
     return new_vector;
 }
 
-Geometry::coordinate_t Geometry::skew_product(const Geometry::Vector & vector_0, const Geometry::Vector & vector_1){
-    if (Geometry::DIMENTION != 2)
-        Geometry::error("Error : not able to take an area with DIMENTION != 2");
+Geometry::coordinate_t Geometry::skew_product(const Vector & vector_0, const Vector & vector_1){
+    if (DIMENTION != 2)
+        error("Error : not able to take an area with DIMENTION != 2");
     return vector_0[0] * vector_1[1] - vector_0[1] * vector_1[0];;
 }
 
 Geometry::coordinate_t Geometry::Vector::operator[] (const int index) const{
-    if (index >= Geometry::DIMENTION)
-        error("Error: attempt to take not exist coordinate ", index, ". DIMENTION = ", Geometry::DIMENTION);
+    if (index >= DIMENTION)
+        error("Error: attempt to take not exist coordinate ", index, ". DIMENTION = ", DIMENTION);
     return this->coordinates[index];
 }
 
 Geometry::coordinate_t & Geometry::Vector::operator[] (const int index) {
-    if (index >= Geometry::DIMENTION)
-        error("Error: attempt to take not exist coordinate ", index, ". DIMENTION = ", Geometry::DIMENTION);
+    if (index >= DIMENTION)
+        error("Error: attempt to take not exist coordinate ", index, ". DIMENTION = ", DIMENTION);
     return this->coordinates[index];
 }
 
-double Geometry::abs(const Geometry::Vector & vector){
+double Geometry::abs(const Vector & vector){
     double result = 0;
-    for (int i = 0; i < Geometry::DIMENTION; ++i)
+    for (int i = 0; i < DIMENTION; ++i)
         result += vector[i] * vector[i];
     result = sqrt(result);
     return result;
 }
 
-double Geometry::sin_agl(const Geometry::Vector & vector_0, const Geometry::Vector & vector_1) {
-    return (Geometry::skew_product(vector_0, vector_1) / Geometry::abs(vector_0) / Geometry::abs(vector_1));
+double Geometry::sin_agl(const Vector & vector_0, const Vector & vector_1) {
+    return (std::abs(skew_product(vector_0, vector_1)) / abs(vector_0) / abs(vector_1));
 }
 
-double Geometry::cos_agl(const Geometry::Vector & vector_0, const Geometry::Vector & vector_1) {
-    return ((vector_0 * vector_1) / Geometry::abs(vector_0) / Geometry::abs(vector_1));
+double Geometry::cos_agl(const Vector & vector_0, const Vector & vector_1) {
+    return ((vector_0 * vector_1) / abs(vector_0) / abs(vector_1));
 }
 
-double Geometry::tan_agl(const Geometry::Vector & vector_0, const Geometry::Vector & vector_1) {
-    return (Geometry::sin_agl(vector_0, vector_1) / Geometry::cos_agl(vector_0, vector_1));
+double Geometry::tan_agl(const Vector & vector_0, const Vector & vector_1) {
+    return (sin_agl(vector_0, vector_1) / cos_agl(vector_0, vector_1));
 }
 
-double Geometry::agl(const Geometry::Vector & vector_0, const Geometry::Vector & vector_1){
-    return acos(Geometry::cos_agl(vector_0, vector_1));
+double Geometry::agl(const Vector & vector_0, const Vector & vector_1){
+    return acos(cos_agl(vector_0, vector_1));
 }
 
-std::ostream & Geometry::operator<<(std::ostream & os, const Geometry::Vector & vector){
-    os << '(';
-    for (int i = 0; i < Geometry::DIMENTION - 1; ++i)
-        os << vector[i] << ", ";
-    os << vector[Geometry::DIMENTION - 1] << ')';
-    return os;
+bool Geometry::are_collinear(const Vector & vector_0, const Vector & vector_1) {
+    return (skew_product(vector_0, vector_1) == 0);
 }
 
-std::istream & Geometry::operator>>(std::istream & is, Geometry::Vector & vector){
-    for (int i = 0; i < Geometry::DIMENTION; ++i)
-        is >> vector[i];
-    return is;
-}
-
-bool Geometry::are_collinear(const Geometry::Vector & vector_0, const Geometry::Vector & vector_1) {
-    return (Geometry::skew_product(vector_0, vector_1) == 0);
-}
-
-bool Geometry::are_coincident(const Geometry::Vector & vector_0, const Geometry::Vector & vector_1) {
+bool Geometry::are_coincident(const Vector & vector_0, const Vector & vector_1) {
     bool are_coinc = true;
-    for (int i = 0; i < Geometry::DIMENTION; ++i) {
+    for (int i = 0; i < DIMENTION; ++i) {
         if (vector_0[i] != vector_1[i]) {
             are_coinc = false;
             break;
@@ -161,6 +151,25 @@ bool Geometry::are_coincident(const Geometry::Vector & vector_0, const Geometry:
         return are_coinc;
 }
 
+bool Geometry::are_complanar(const Vector & vector_0, const Vector & vector_1, const Vector & vector_2){
+    if (DIMENTION > 2)
+        error("Error : not able to do complanarity test with DIMENTION != 2");
+   return true;
+}
+
+std::ostream & Geometry::operator << (std::ostream & os, const Vector & vector) {
+    os << '(';
+    for (int i = 0; i < DIMENTION - 1; ++i)
+        os << vector[i] << ", ";
+    os << vector[DIMENTION - 1] << ')';
+    return os;
+}
+
+std::istream & Geometry::operator >> (std::istream & is, Vector & vector) {
+    for (int i = 0; i < DIMENTION; ++i)
+        is >> vector[i];
+    return is;
+}
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //Class Point: public Shape {};
@@ -174,7 +183,7 @@ Geometry::Point::Point(const coordinate_t & coor_0, const coordinate_t & coor_1)
 Geometry::Point::Point(const Vector ragius_vector) :
     radius_vector(radius_vector) {}
 
-Geometry::Point & Geometry::Point::move(const Geometry::Vector & vector){
+Geometry::Point & Geometry::Point::move(const Vector & vector){
     this->radius_vector += vector;
     return *this;
 }
@@ -187,12 +196,12 @@ bool Geometry::Point::has_intarsection_with(const Segment & segment) const{
     return segment.has_point(*this);
 }
 
-std::ostream & Geometry::operator<<(std::ostream & os, const Geometry::Point & point){
+std::ostream & Geometry::operator<<(std::ostream & os, const Point & point){
     os << point.radius_vector;
     return os;
 }
 
-std::istream & Geometry::operator>>(std::istream & is, Geometry::Point & point){
+std::istream & Geometry::operator>>(std::istream & is, Point & point){
     is >> point.radius_vector;
     return is;
 }
@@ -215,7 +224,7 @@ Geometry::Segment::Segment(const Point & origen, const Vector & direction, const
     this->point_1 = origen.get_radius_vector() + direction / abs(direction) * length;
 }
 
-Geometry::Segment & Geometry::Segment::move(const Geometry::Vector & vector){
+Geometry::Segment & Geometry::Segment::move(const Vector & vector){
     this->point_0.move(vector);
     this->point_1.move(vector);
     return *this;
@@ -231,3 +240,38 @@ bool Geometry::Segment::has_intarsection_with(const Segment & segment) const{
     return false;/////////////////////////////////////////////////////////////////////////////////////////////////////////
 }
 
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//Class Line: public Shape {};
+Geometry::Line & Geometry::Line::move(const Vector & vector){
+    this->origen.move(vector);
+    return *this;
+}
+
+bool Geometry::Line::has_point(const Point & point) const {
+    return are_collinear(direction, origen.get_radius_vector() - point.get_radius_vector());
+}
+
+bool Geometry::Line::has_intarsection_with(const Segment & segment) const {
+
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    return false;
+}
+
+bool Geometry::are_coincident(const Line & line_0, const Line & line_1) {
+    return are_parallel(line_0, line_1) && 
+        are_collinear(line_0.origen.get_radius_vector() - line_1.origen.get_radius_vector(), line_0.direction);
+}
+
+bool Geometry::are_parallel(const Line & line_0, const Line & line_1) {
+    return are_collinear(line_0.direction, line_1.direction);;
+}
+
+bool Geometry::are_intersecting(const Line & line_0, const Line & line_1){
+    return are_complanar(line_0.direction, line_1.direction, line_0.origen.get_radius_vector() - line_1.origen.get_radius_vector()) && 
+        !are_parallel(line_0, line_1);
+}
+
+bool Geometry::are_skew(const Line & line_0, const Line & line_1) {
+    return !are_complanar(line_0.direction, line_1.direction, line_0.origen.get_radius_vector() - line_1.origen.get_radius_vector());
+}

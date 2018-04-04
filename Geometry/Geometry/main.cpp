@@ -21,6 +21,8 @@ int main() {
     Segment segment(Point(1, 1), Point(3, 5));
     cout << segment.has_point(con_point) << endl;
     Point x(b);
+    Vector v(p, Point(2, 2));
+    cout << v << endl;
     getchar();
     getchar();
     return 0;
