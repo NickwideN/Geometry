@@ -9,11 +9,14 @@
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!добавь все конструкторы и операции = !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 namespace Geometry {
     typedef double coordinate_t;
+    typedef double scalar_t;
     const static int DIMENTION = 2;
     constexpr static coordinate_t default_value = 0;
     class Point;
     class Segment;
     class Line;
+    class Ray;
+    class Polygon;
     class Vector {
     private:
         coordinate_t coordinates[DIMENTION];
@@ -35,31 +38,32 @@ namespace Geometry {
         friend Vector operator - (const Vector & vector_0, const Vector & vector_1);
         Vector operator + () const;
         Vector operator - () const;
-        Vector & operator *= (const coordinate_t & coefficient);
-        Vector & operator /= (const coordinate_t & coefficient);
-        friend Vector operator * (const Vector & vector, const coordinate_t & coefficient);
-        friend Vector operator / (const Vector & vector, const coordinate_t & coefficient);
-        friend coordinate_t operator * (const Vector & vector_0, const Vector & vector_1);
-        friend coordinate_t scalar_product(const Vector & vector_0, const Vector & vector_1);
+        Vector & operator *= (const scalar_t & coefficient);
+        Vector & operator /= (const scalar_t & coefficient);
+        friend Vector operator * (const Vector & vector, const scalar_t & coefficient);
+        friend Vector operator / (const Vector & vector, const scalar_t & coefficient);
+        friend scalar_t operator * (const Vector & vector_0, const Vector & vector_1);
+        friend scalar_t scalar_product(const Vector & vector_0, const Vector & vector_1);
         friend Vector vector_product(const Vector & vector_0, const Vector & vector_1);
         friend coordinate_t skew_product(const Vector & vector_0, const Vector & vector_1);
         coordinate_t operator [] (const int index) const;
         coordinate_t & operator [] (const int index);
-        friend double abs(const Vector & vector);
+        friend scalar_t abs(const Vector & vector);
         friend double sin_agl(const Vector & vector_0, const Vector & vector_1);
         friend double cos_agl(const Vector & vector_0, const Vector & vector_1);
         friend double tan_agl(const Vector & vector_0, const Vector & vector_1);
         friend double agl(const Vector & vector_0, const Vector & vector_1);
         friend bool are_collinear(const Vector & vector_0, const Vector & vector_1);
         friend bool are_coincident(const Vector & vector_0, const Vector & vector_1);
-        friend bool are_complanar(const Vector & vector_0, const Vector & vector_1, const Vector & vector_2); // no description
+        friend bool are_complanar(const Vector & vector_0, const Vector & vector_1, const Vector & vector_2); // discription only for DIMENTION < 3
+        friend scalar_t length(const Point & point_0, const Point & point_1);
         friend std::ostream & operator << (std::ostream & os, const Vector & vector);
         friend std::istream & operator >> (std::istream & is, Vector & vector);
     };
 
     class Shape {
     public:
-        virtual double getArea() {
+        virtual scalar_t getArea() {
             return 0.0;
         }
         virtual Shape & move(const Vector & vector) = 0;
@@ -79,10 +83,14 @@ namespace Geometry {
         bool has_intarsection_with(const Segment & segment) const override;
         friend std::ostream & operator << (std::ostream & os, const Point & vector);
         friend std::istream & operator >> (std::istream & is, Point & vector);
-        Vector get_radius_vector() const;
 
-        friend class Segment;
-        friend class Line;
+
+        friend Vector;
+        friend Segment;
+        friend Line;
+        friend bool are_coincident(const Line & line_0, const Line & line_1);
+        friend bool are_intersecting(const Line & line_0, const Line & line_1);
+        friend bool are_skew(const Line & line_0, const Line & line_1);
     };
 
     class Segment : public Shape {
@@ -92,18 +100,18 @@ namespace Geometry {
     public:
         Segment();
         Segment(const Point & point_0, const Point & point_1);
-        Segment(const Point & origen, const Vector & direction, const coordinate_t & length);
-        Segment & move(const Vector & vector) override;
+        Segment(const Point & origen, const Vector & direction, const scalar_t & length);
 
+        Segment & move(const Vector & vector) override;
         virtual bool has_point(const Point & point) const override;
-        virtual bool has_intarsection_with(const Segment & segment) const override;///////////////////////////////////////////
-        friend coordinate_t length(const Segment & segment);
+        virtual bool has_intarsection_with(const Segment & segment) const override;
+
+        friend scalar_t length(const Segment & segment);
 
         friend std::ostream & operator << (std::ostream & os, const Segment & segment);
         friend std::istream & operator >> (std::istream & is, Segment & segmant);
 
-        Point get_point_0() const;
-        Point get_point_1() const;
+        friend Line;
     };
 
     class Line : public Shape {
@@ -112,7 +120,7 @@ namespace Geometry {
         Vector direction;
     public:
         Line(const Point & point_0, const Point & point_1);
-        Line(const Point & origen, const Vector & direction, const char * vector = "direction"); // vector can be normal
+        Line(const Point & origen, const Vector & direction, const char * vector = "direction"); // vector can be normal or direction
         Line(const coordinate_t & coefficient_of_x, const coordinate_t & coefficient_of_y, const coordinate_t & absolute_term);   // Ax + By + C = 0
         Line(const Segment & segmant);
 
