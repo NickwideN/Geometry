@@ -2,12 +2,13 @@
 #include<iostream>
 #include<cmath> //sqrt
 #include<algorithm> //min, max
+#include<cstring>    //strcmp
 Geometry::Vector::Vector() {
     for (int i = 0; i < DIMENTION; ++i)
         this->coordinates[i] = default_value;
 }
 
-Geometry::Vector::Vector(const coordinate_t coor_0, const coordinate_t coor_1, const coordinate_t coor_2){ //let put a several types
+Geometry::Vector::Vector(const coordinate_t coor_0, const coordinate_t coor_1, const coordinate_t coor_2) {
     coordinates[0] = coor_0;
     if (1 < DIMENTION)
         this->coordinates[1] = coor_1;
@@ -28,7 +29,7 @@ Geometry::Vector & Geometry::Vector::operator+=(const Vector & vector) {
     return *this;
 }
 
-Geometry::Vector Geometry::operator + (const Vector & vector_0, const Vector & vector_1){
+Geometry::Vector Geometry::operator + (const Vector & vector_0, const Vector & vector_1) {
     Geometry::Vector new_vector(vector_0);
     return new_vector += vector_1;
 }
@@ -64,20 +65,20 @@ Geometry::Vector Geometry::operator * (const Vector & vector, const scalar_t & c
     return new_vector *= coefficient;
 }
 
-Geometry::Vector & Geometry::Vector::operator /= (const scalar_t & coefficient){
+Geometry::Vector & Geometry::Vector::operator /= (const scalar_t & coefficient) {
     return *this *= 1 / coefficient;
 }
 
-Geometry::Vector Geometry::operator / (const Vector & vector, const scalar_t & coefficient){
+Geometry::Vector Geometry::operator / (const Vector & vector, const scalar_t & coefficient) {
     Vector new_vector(vector);
     return new_vector /= coefficient;
 }
 
-Geometry::scalar_t Geometry::operator * (const Vector & vector_0, const Vector & vector_1){
+Geometry::scalar_t Geometry::operator * (const Vector & vector_0, const Vector & vector_1) {
     return scalar_product(vector_0, vector_1);
 }
 
-Geometry::scalar_t Geometry::scalar_product(const Vector & vector_0, const Vector & vector_1){
+Geometry::scalar_t Geometry::scalar_product(const Vector & vector_0, const Vector & vector_1) {
     Geometry::scalar_t product = 0;
     for (int i = 0; i < DIMENTION; ++i)
         product += vector_0[i] * vector_1[i];
@@ -86,7 +87,7 @@ Geometry::scalar_t Geometry::scalar_product(const Vector & vector_0, const Vecto
 
 Geometry::Vector Geometry::vector_product(const Vector & vector_0, const Vector & vector_1) {
     if (DIMENTION != 3)
-        error("Error: not able to take vector product with DIMENTION != 3. For getting an area of parallelogram on the vectors use function \"skew_product(Vector vector1, Vector vector2)\"");
+        throw "There is no opportunity to take vector product with DIMENTION != 3. For getting an area of parallelogram on the vectors use function \"skew_product(Vector vector1, Vector vector2)\"";
     Vector new_vector;
     new_vector[0] = vector_0[1] * vector_1[2] - vector_0[2] * vector_1[1];
     new_vector[1] = -vector_0[0] * vector_1[2] + vector_0[2] * vector_1[0];
@@ -94,21 +95,22 @@ Geometry::Vector Geometry::vector_product(const Vector & vector_0, const Vector 
     return new_vector;
 }
 
-Geometry::scalar_t Geometry::skew_product(const Vector & vector_0, const Vector & vector_1){
+Geometry::scalar_t Geometry::skew_product(const Vector & vector_0, const Vector & vector_1) {
     if (DIMENTION != 2)
-        error("Error : not able to take an area with DIMENTION != 2");
+        throw "There is no opportunity to take an area with DIMENTION != 2";
     return vector_0[0] * vector_1[1] - vector_0[1] * vector_1[0];;
 }
 
-Geometry::coordinate_t Geometry::Vector::operator[] (const int index) const{
+Geometry::coordinate_t Geometry::Vector::operator[] (const int index) const {
     if (index >= DIMENTION)
-        error("Error: attempt to take not exist coordinate ", index, ". DIMENTION = ", DIMENTION);
+        throw "Attempt to take not exist coordinate of vector";
     return this->coordinates[index];
 }
 
 Geometry::coordinate_t & Geometry::Vector::operator[] (const int index) {
-    if (index >= DIMENTION)
-        error("Error: attempt to take not exist coordinate ", index, ". DIMENTION = ", DIMENTION);
+    if (index >= DIMENTION) {
+        throw "Attempt to take not exist coordinate of vector";
+    }
     return this->coordinates[index];
 }
 
@@ -132,7 +134,7 @@ double Geometry::tan_agl(const Vector & vector_0, const Vector & vector_1) {
     return (sin_agl(vector_0, vector_1) / cos_agl(vector_0, vector_1));
 }
 
-double Geometry::agl(const Vector & vector_0, const Vector & vector_1){
+double Geometry::agl(const Vector & vector_0, const Vector & vector_1) {
     return acos(cos_agl(vector_0, vector_1));
 }
 
@@ -151,9 +153,9 @@ bool Geometry::are_coincident(const Vector & vector_0, const Vector & vector_1) 
         return are_coinc;
 }
 
-bool Geometry::are_complanar(const Vector & vector_0, const Vector & vector_1, const Vector & vector_2){
+bool Geometry::are_complanar(const Vector & vector_0, const Vector & vector_1, const Vector & vector_2) {
     if (DIMENTION > 2)
-        error("Error : not able to do complanarity test with DIMENTION != 2");
+        throw "There is no opportunity to do complanarity test with DIMENTION != 2. //The library needs definition for DIMENTION > 2";
    return true;
 }
 
@@ -190,7 +192,7 @@ Geometry::Point::Point(const Vector ragius_vector) :
     radius_vector(radius_vector) {
 }
 
-Geometry::Point & Geometry::Point::move(const Vector & vector){
+Geometry::Point & Geometry::Point::move(const Vector & vector) {
     this->radius_vector += vector;
     return *this;
 }
@@ -199,16 +201,16 @@ bool Geometry::Point::has_point(const Point & point) const{
     return are_coincident(this->radius_vector, point.radius_vector);
 }
 
-bool Geometry::Point::has_intarsection_with(const Segment & segment) const{
+bool Geometry::Point::has_intarsection_with(const Segment & segment) const {
     return segment.has_point(*this);
 }
 
-std::ostream & Geometry::operator<<(std::ostream & os, const Point & point){
+std::ostream & Geometry::operator<<(std::ostream & os, const Point & point) {
     os << point.radius_vector;
     return os;
 }
 
-std::istream & Geometry::operator>>(std::istream & is, Point & point){
+std::istream & Geometry::operator>>(std::istream & is, Point & point) {
     is >> point.radius_vector;
     return is;
 }
@@ -230,37 +232,63 @@ Geometry::Segment::Segment(const Point & origen, const Vector & direction, const
     this->point_1 = origen.radius_vector + direction / abs(direction) * length;
 }
 
-Geometry::Segment & Geometry::Segment::move(const Vector & vector){
+Geometry::Segment & Geometry::Segment::move(const Vector & vector) {
     this->point_0.move(vector);
     this->point_1.move(vector);
     return *this;
 }
 
-bool Geometry::Segment::has_point(const Point & point) const{
+bool Geometry::Segment::has_point(const Point & point) const {
     return (std::abs(skew_product(this->point_0.radius_vector, point.radius_vector)) + 
                 std::abs(skew_product(point.radius_vector, this->point_1.radius_vector)) == 
                     std::abs(skew_product(this->point_0.radius_vector, this->point_1.radius_vector)));
 }
 
-bool Geometry::Segment::has_intarsection_with(const Segment & segment) const{
+bool Geometry::Segment::has_intarsection_with(const Segment & segment) const {
     return Line(*this).has_intarsection_with(segment) && Line(segment).has_intarsection_with(*this);
 }
 
-Geometry::scalar_t Geometry::length(const Segment & segment){
+Geometry::scalar_t Geometry::length(const Segment & segment) {
     return length(segment.point_0, segment.point_1);
 }
-
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //Class Line: public Shape {};
+
+Geometry::Line::Line(const Point & point_0, const Point & point_1) :
+    origen(point_0), direction(Vector(point_0, point_1)) {
+}
+
+Geometry::Line::Line(const Point & origen, const Vector & vector, const char * name_vector) :
+    origen(origen) {
+    if (!strcmp(name_vector, "direction"))
+        this->direction = vector;
+    else if (!strcmp(name_vector, "normal")) {
+        if (DIMENTION == 2)
+            direction = Vector(-vector[1], vector[0]);
+        else
+            throw "There is no opportunity to do define normal vector for line with DIMENTION != 2 ";
+    }
+    else {
+        throw "Not correct name of vector. You can choose names \"direction\" (default) or \"vector\"";
+        this->direction = vector;
+    }
+}
+
+Geometry::Line::Line(const coordinate_t & coefficient_of_x, const coordinate_t & coefficient_of_y, const coordinate_t & absolute_term) {
+    if (DIMENTION != 2)
+        throw "There is no able to create line use equation Ax + By + C = 0 with DIMENTION != 2";
+    direction = Vector(-coefficient_of_y, coefficient_of_x);
+    origen = Point(0, -absolute_term/coefficient_of_y);
+}
 
 Geometry::Line::Line(const Segment & segment) :
     origen(segment.point_0),
     direction(Vector(segment.point_0, segment.point_0)) {
 }
 
-Geometry::Line & Geometry::Line::move(const Vector & vector){
+Geometry::Line & Geometry::Line::move(const Vector & vector) {
     this->origen.move(vector);
     return *this;
 }
@@ -294,3 +322,26 @@ bool Geometry::are_intersecting(const Line & line_0, const Line & line_1){
 bool Geometry::are_skew(const Line & line_0, const Line & line_1) {
     return !are_complanar(line_0.direction, line_1.direction, line_0.origen.radius_vector - line_1.origen.radius_vector);
 }
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//Class Ray: public Shape {};
+
+Geometry::Ray & Geometry::Ray::move(const Vector & vector) {
+    this->origen.move(vector);
+    return *this;
+}
+
+bool Geometry::Ray::has_point(const Point & point) const { ///////////////////////////////////////////////////////////////////
+    return false;
+}
+
+bool Geometry::Ray::has_intarsection_with(const Segment & segment) const ////////////////////////////////////////////////////////
+{
+    return false;
+}
+
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
+//Class Polygon: public Shape {};
+

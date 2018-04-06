@@ -23,6 +23,13 @@ int main() {
     Point x(b);
     Vector v(p, Point(2, 2));
     cout << v << endl;
+    try {
+        a[10] = 1;
+    }
+    catch (char *) {
+        cout << "error index";
+    }
+    //Line l1(p, a, "j");
     getchar();
     getchar();
     return 0;

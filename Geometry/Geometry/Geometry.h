@@ -3,7 +3,7 @@
 #include<iostream>
 #include<deque>
 //-------------------------------------------------------------------------------------------------
-//                          README.md here: https://github.com/NickwideN/Geometry
+//                          README.md is here: https://github.com/NickwideN/Geometry
 //-------------------------------------------------------------------------------------------------
 
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!добавь все конструкторы и операции = !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -20,10 +20,7 @@ namespace Geometry {
     class Vector {
     private:
         coordinate_t coordinates[DIMENTION];
-        template <typename T1 = const char *, typename T2 = const char *, typename T3 = const char *, typename T4 = const char *>
-        friend void error(T1 p1, T2 p2 = "", T3 p3 = "", T4 p4 = "");
     public:
-
         Vector();
         template<typename user_t>
         Vector(const user_t coor_0, const user_t coor_1, const user_t coor_2, const user_t coor_3, ...);
@@ -76,14 +73,13 @@ namespace Geometry {
         Vector radius_vector;
     public:
         Point();
-        Point(const coordinate_t & coor_0, const coordinate_t & coor_1 = default_value); // no konstruktors for Demention > 2//////////////////
+        Point(const coordinate_t & coor_0, const coordinate_t & coor_1 = default_value); //no konstruktors for Demention > 2//////////////////
         Point(const Vector ragius_vector);
         Point & move(const Vector & vector) override;
         bool has_point(const Point & point) const override;
         bool has_intarsection_with(const Segment & segment) const override;
         friend std::ostream & operator << (std::ostream & os, const Point & vector);
         friend std::istream & operator >> (std::istream & is, Point & vector);
-
 
         friend Vector;
         friend Segment;
@@ -120,7 +116,7 @@ namespace Geometry {
         Vector direction;
     public:
         Line(const Point & point_0, const Point & point_1);
-        Line(const Point & origen, const Vector & direction, const char * vector = "direction"); // vector can be normal or direction
+        Line(const Point & origen, const Vector & vector, const char * name_vector = "direction"); // vector can be normal or direction
         Line(const coordinate_t & coefficient_of_x, const coordinate_t & coefficient_of_y, const coordinate_t & absolute_term);   // Ax + By + C = 0
         Line(const Segment & segmant);
 
@@ -139,7 +135,7 @@ namespace Geometry {
 
     class Ray : public Shape {
     private:
-        Point oriden;
+        Point origen;
         Vector direction;
     public:
         Ray(const Point & origen, const Vector & direction); 
@@ -178,14 +174,6 @@ namespace Geometry {
             coordinates[i] = *pointer_coor;
             ++pointer_coor;
         }
-    }
-
-    template<typename T1, typename T2, typename T3, typename T4>
-    inline void error(T1 p1, T2 p2, T3 p3, T4 p4) {
-        std::cerr << "Error: " << p1 << p2 << p3 << p4 << '\n';
-        getchar();
-        getchar();
-        std::exit(1);
     }
 }
 
