@@ -252,6 +252,16 @@ Geometry::scalar_t Geometry::length(const Segment & segment) {
     return length(segment.point_0, segment.point_1);
 }
 
+std::ostream & Geometry::operator << (std::ostream & os, const Segment & segment) {
+    os << "point_0: " << segment.point_0 << " point_1: " << segment.point_1;
+    return os;
+}
+
+std::istream & Geometry::operator >> (std::istream & is, Segment & segmant) {
+    is >> segmant.point_0 >> segmant.point_1;
+    return is;
+}
+
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //Class Line: public Shape {};
@@ -323,9 +333,23 @@ bool Geometry::are_skew(const Line & line_0, const Line & line_1) {
     return !are_complanar(line_0.direction, line_1.direction, line_0.origen.radius_vector - line_1.origen.radius_vector);
 }
 
+std::ostream & Geometry::operator << (std::ostream & os, const Line & line) {
+    os << "origen: " << line.origen << " direction: " << line.direction;
+    return os;
+}
+
+std::istream & Geometry::operator >> (std::istream & is, Line & line) {
+    is >> line.origen >> line.direction;
+    return is;
+}
+
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //Class Ray: public Shape {};
+
+Geometry::Ray::Ray(const Point & origen, const Vector & direction) :
+    origen(origen), direction(direction) {
+}
 
 Geometry::Ray & Geometry::Ray::move(const Vector & vector) {
     this->origen.move(vector);
@@ -341,7 +365,43 @@ bool Geometry::Ray::has_intarsection_with(const Segment & segment) const ///////
     return false;
 }
 
+std::ostream & Geometry::operator << (std::ostream & os, const Ray & ray) {
+    os << "origen: " << ray.origen << " direction :" << ray.direction;
+    return os;
+}
+
+std::istream & Geometry::operator >> (std::istream & is, Ray & ray) {
+    is >> ray.origen >> ray.direction;
+    return is;
+}
+
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //Class Polygon: public Shape {};
 
+Geometry::Polygon & Geometry::Polygon::move(const Vector & vector) {
+    for (int i = 0; i < this->points_cnt; ++i)
+        this->points[i].move(vector);
+    return *this;
+}
+
+bool Geometry::Polygon::has_point(const Point & point) const /////////////////////////////////////////////////////////////////////////
+{
+    return false;
+}
+
+bool Geometry::Polygon::has_intarsection_with(const Segment & segment) const ///////////////////////////////////////////////////////////
+{
+    return false;
+}
+
+
+std::ostream & Geometry::operator << (std::ostream & os, const Polygon & polygon) {
+    for (int i = 0; i < polygon.points_cnt; ++i)
+        os << "point_" << i << ": " << polygon.points[i] << " ";
+}
+
+std::istream & Geometry::operator >> (std::istream & is, Polygon & polygon) {
+    for (int i = 0; i < polygon.points_cnt; ++i)
+        is >> polygon.points[i];
+}

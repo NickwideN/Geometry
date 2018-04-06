@@ -140,8 +140,8 @@ namespace Geometry {
     public:
         Ray(const Point & origen, const Vector & direction); 
         Ray & move(const Vector & vector) override;
-        bool has_point(const Point & point) const override;
-        bool has_intarsection_with(const Segment & segment) const override;
+        bool has_point(const Point & point) const override; //////////////////////////////////////////////////////////////
+        bool has_intarsection_with(const Segment & segment) const override; ////////////////////////////////////////////////////
 
         friend std::ostream & operator << (std::ostream & os, const Ray & ray);
         friend std::istream & operator >> (std::istream & is, Ray & ray);
@@ -149,20 +149,22 @@ namespace Geometry {
 
     class Polygon : public Shape {
     private:
-        std::deque<Point> points;
+        Point* points;
+        int points_cnt;
     public:
         // проверка на непересечение сторон полигона
         Polygon();
         Polygon(const int number_of_points, const Point * points);
         Polygon(const int number_of_points, ...);
+        ~Polygon();
         Polygon & add_point(const Point point);
 
         Polygon & move(const Vector & vector) override;
         bool has_point(const Point & point) const override;
         bool has_intarsection_with(const Segment & segment) const override;
 
-        friend std::ostream & operator << (std::ostream & os, const Ray & ray);
-        friend std::istream & operator >> (std::istream & is, Ray & ray);
+        friend std::ostream & operator << (std::ostream & os, const Polygon & polygon);
+        friend std::istream & operator >> (std::istream & is, Polygon & polygon);
     };
 #endif // !_NickwideN_Geometry_H
 
