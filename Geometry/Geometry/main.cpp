@@ -8,7 +8,12 @@ int main() {
     a = Vector(1, 1);
     b = a + b;
     b = a + Geometry::Vector(2, 4);
-    std::cout << Geometry::skew_product(Geometry::Vector(6, 3), b) << std::endl;
+    try {
+        std::cout << Geometry::vector_product(Geometry::Vector(6, 3), b) << std::endl;
+    }
+    catch (char * er) {
+        cout << er << endl;
+    }
     Geometry::Vector c(-1, -1);
     std::cout << c << '\n';
     std::cout << agl(c, a) << '\n';
@@ -31,7 +36,7 @@ int main() {
     }
     //Line l1(p, a, "j");
     getchar();
-    getchar();
+    getchar(); 
     return 0;
 }
 
