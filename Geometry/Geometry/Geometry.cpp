@@ -1,7 +1,7 @@
 #include"Geometry.h"
 #include<iostream>
-#include<cstring>    //strcmp
-
+#include<cstring>    // strcmp
+#include<cmath>      // sqrt
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //Class Vector {};
@@ -203,11 +203,9 @@ bool Geometry::are_co_directed(const Vector & vector_0, const Vector & vector_1)
 }
 
 std::ostream & Geometry::operator << (std::ostream & os, const Vector & vector) {
-    os << '(';
-    for (int i = 0; i < DIMENTION - 1; ++i) {
-        os << vector[i] << ", ";
+    for (int i = 0; i < DIMENTION; ++i) {
+        os << vector[i] << " ";
     }
-    os << vector[DIMENTION - 1] << ')';
     return os;
 }
 
@@ -278,7 +276,7 @@ Geometry::scalar_t Geometry::Point::distance_to(const Segment & segment) {
     } else {
         scalar_t distance_to_0 = length(*this, segment.point_0);
         scalar_t distance_to_1 = length(*this, segment.point_1);
-        return (distance_to_0 > distance_to_1 ? distance_to_0 : distance_to_1);
+        return (distance_to_0 < distance_to_1 ? distance_to_0 : distance_to_1);
     }
 }
 

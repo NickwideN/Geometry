@@ -5,9 +5,9 @@
 #ifndef _NickwideN_Geometry_H
 #define _NickwideN_Geometry_H
 #include<iostream>
-#include<cstring> // strcmp
+#include<cstring>    // strcmp
+#include<cmath>      // sqrt
 
-//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!добавь все конструкторы и операции = !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 namespace Geometry {
     typedef double coordinate_t;
     typedef double scalar_t;
