@@ -1,9 +1,11 @@
-#ifndef _NickwideN_Geometry_H
-#define _NickwideN_Geometry_H
-#include<iostream>
 //-------------------------------------------------------------------------------------------------
 //                          README.md is here: https://github.com/NickwideN/Geometry
 //-------------------------------------------------------------------------------------------------
+
+#ifndef _NickwideN_Geometry_H
+#define _NickwideN_Geometry_H
+#include<iostream>
+#include<cstring> // strcmp
 
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!добавь все конструкторы и операции = !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 namespace Geometry {
@@ -174,7 +176,7 @@ namespace Geometry {
     public:
         // проверка на непересечение сторон полигона
         Polygon();
-        Polygon(const int number_of_points, const Point * points);
+        Polygon(const int & number_of_points, const Point * points);
         Polygon(const int number_of_points, ...);
         ~Polygon();
         Polygon & add_point(const Point point);

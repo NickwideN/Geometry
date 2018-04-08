@@ -1,6 +1,5 @@
 #include"Geometry.h"
 #include<iostream>
-#include<cmath> //sqrt
 #include<cstring>    //strcmp
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -552,6 +551,23 @@ std::istream & Geometry::operator >> (std::istream & is, Ray & ray) {
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //Class Polygon: public Shape {};
 
+Geometry::Polygon::Polygon() {
+    this->points_cnt = 1;
+    this->points = new Point[points_cnt];
+    this->points[0] = Point();
+}
+
+Geometry::Polygon::Polygon(const int & number_of_points, const Point * points) {
+    this->points_cnt = number_of_points;
+    for (int i = 0; i < this->points_cnt; ++i) {
+        this->points[i] = points[i];
+    }
+}
+
+Geometry::Polygon::~Polygon() {
+    delete[] points;
+}
+
 Geometry::Polygon & Geometry::Polygon::move(const Vector & vector) {
     for (int i = 0; i < this->points_cnt; ++i) {
         this->points[i].move(vector);
@@ -561,7 +577,6 @@ Geometry::Polygon & Geometry::Polygon::move(const Vector & vector) {
 
 bool Geometry::Polygon::has_point(const Point & point) const {
     bool poligon_contain_point = false;
-
     return false;
 }
 

@@ -18,6 +18,7 @@ int main() {
 */
 
 // G
+/*
 int main() {
     Segment a;
     Segment b;
@@ -28,3 +29,27 @@ int main() {
     getchar();
     return 0;
 }
+*/
+int main() {
+    Point C;
+    Point A;
+    Point B;
+    cin >> C >> A >> B;
+    cout << setprecision(9) << fixed;
+    cout << C.distance_to(Line(A, B)) << '\n';
+    cout << C.distance_to(Ray(A, B)) << '\n';
+    cout << C.distance_to(Segment(A, B)) << '\n';
+    getchar();
+    getchar();
+    return 0;
+}
+
+/*
+int main() {
+    Polygon a;
+    cin >> a;
+    getchar();
+    getchar();
+    return 0;
+}
+*/
