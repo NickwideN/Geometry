@@ -1,7 +1,6 @@
 #include"Geometry.h"
 #include<iostream>
 #include<cmath> //sqrt
-#include<algorithm> //min, max
 #include<cstring>    //strcmp
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
@@ -71,7 +70,7 @@ Geometry::Vector & Geometry::Vector::operator *= (const scalar_t & coefficient) 
 }
 
 Geometry::Vector Geometry::operator * (const Vector & vector, const scalar_t & coefficient) {
-    Geometry::Vector new_vector(vector);
+    Vector new_vector(vector);
     return new_vector *= coefficient;
 }
 
@@ -97,7 +96,7 @@ Geometry::scalar_t Geometry::operator * (const Vector & vector_0, const Vector &
 }
 
 Geometry::scalar_t Geometry::scalar_product(const Vector & vector_0, const Vector & vector_1) {
-    Geometry::scalar_t product = 0;
+    scalar_t product = 0;
     for (int i = 0; i < DIMENTION; ++i) {
         product += vector_0[i] * vector_1[i];
     }
@@ -117,7 +116,8 @@ Geometry::Vector Geometry::vector_product(const Vector & vector_0, const Vector 
 }
 
 Geometry::scalar_t Geometry::skew_product(const Vector & vector_0, const Vector & vector_1) {
-    // TODO: insert the code for DIMENTION > 2
+    // The solution is presented for DIMENTION == (2 & 3);
+    // TODO: insert solution for DIMENTION > 3;
     if (!(DIMENTION == 2 || DIMENTION == 3)) {
         throw "There is no opportunity to take an area with 1 >= DIMENTION >= 4 ";
     }
@@ -183,11 +183,24 @@ bool Geometry::are_coincident(const Vector & vector_0, const Vector & vector_1) 
 }
 
 bool Geometry::are_complanar(const Vector & vector_0, const Vector & vector_1, const Vector & vector_2) {
-    // TODO: insert the code for DIMENTION > 2
+    // The solution is presented for DIMENTION == 2;
+    // TODO: insert solution for DIMENTION > 2;
     if (DIMENTION > 2) {
         throw "There is no opportunity to do complanarity test with DIMENTION != 2";
     }
    return true;
+}
+
+bool Geometry::are_co_directed(const Vector & vector_0, const Vector & vector_1) {
+    if (are_collinear(vector_0, vector_1)) {
+        for (int i = 0; i < DIMENTION; ++i) {
+            if (vector_0[i] * vector_1[i] < 0) {
+                return false;
+            }
+        }
+        return true;
+    }
+    return false;
 }
 
 std::ostream & Geometry::operator << (std::ostream & os, const Vector & vector) {
@@ -217,7 +230,7 @@ Geometry::Point::Point(const coordinate_t & coor_0, const coordinate_t & coor_1)
     radius_vector(coor_0, coor_1) {
 }
 
-Geometry::Point::Point(const Vector ragius_vector) :
+Geometry::Point::Point(const Vector radius_vector) :
     radius_vector(radius_vector) {
 }
 
@@ -232,6 +245,42 @@ bool Geometry::Point::has_point(const Point & point) const{
 
 bool Geometry::Point::has_intarsection_with(const Segment & segment) const {
     return segment.has_point(*this);
+}
+
+Geometry::scalar_t Geometry::Point::distance_to(const Line & line) {
+    Line parallel_line(*this, line.direction);
+    return distance_between(line, parallel_line);
+}
+
+Geometry::scalar_t Geometry::Point::distance_to(const Ray & ray) {
+    // The solution is presented for DIMENTION == 2;
+    // TODO: insert solution for DIMENTION > 2;
+    if (DIMENTION > 2) {
+        throw "There is no opportunity to take distance from point to ray with DIMENTION > 2";
+    }
+    Line parallel_line(*this, ray.direction);
+    Line normal_line(ray.origen, Vector(-ray.direction[1], ray.direction[0]));
+    Point inter_point = intersection(parallel_line, normal_line);
+    if (are_co_directed(Vector(inter_point, *this), ray.direction)) {
+        return this->distance_to(Line(ray));
+    } else {
+        return length(*this, ray.origen);
+    }
+}
+
+Geometry::scalar_t Geometry::Point::distance_to(const Segment & segment) {
+    // The solution is presented for DIMENTION == 2;
+    // TODO: insert solution for DIMENTION > 2;
+    if (DIMENTION > 2) {
+        throw "There is no opportunity to take distance from point to segment with DIMENTION > 2";
+    }
+    if (Line(*this, Vector(-Line(segment).direction[1], Line(segment).direction[0])).has_intarsection_with(segment)) {
+        return this->distance_to(Line(segment));
+    } else {
+        scalar_t distance_to_0 = length(*this, segment.point_0);
+        scalar_t distance_to_1 = length(*this, segment.point_1);
+        return (distance_to_0 > distance_to_1 ? distance_to_0 : distance_to_1);
+    }
 }
 
 Geometry::scalar_t Geometry::length(const Point & point_0, const Point & point_1) {
@@ -272,17 +321,42 @@ Geometry::Segment & Geometry::Segment::move(const Vector & vector) {
 }
 
 bool Geometry::Segment::has_point(const Point & point) const {
-    return (std::abs(skew_product(this->point_0.radius_vector, point.radius_vector)) + 
-                std::abs(skew_product(point.radius_vector, this->point_1.radius_vector)) == 
-                    std::abs(skew_product(this->point_0.radius_vector, this->point_1.radius_vector)));
+    Segment tmp_seg = *this;
+    Point tmp_point = point;
+    if (skew_product(tmp_seg.point_0.radius_vector, tmp_seg.point_1.radius_vector) == 0) {
+        Vector move_vector(1, 1);
+        if (are_collinear(move_vector, Line(tmp_seg).direction)) {
+            move_vector = Vector(1, 2);
+        }
+        tmp_point.move(move_vector);
+        tmp_seg.move(move_vector);
+    }
+    return (std::abs(skew_product(tmp_seg.point_0.radius_vector, tmp_point.radius_vector)) + 
+                std::abs(skew_product(tmp_point.radius_vector, tmp_seg.point_1.radius_vector)) == 
+                    std::abs(skew_product(tmp_seg.point_0.radius_vector, tmp_seg.point_1.radius_vector)));
 }
 
 bool Geometry::Segment::has_intarsection_with(const Segment & segment) const {
+    Line(*this).has_intarsection_with(segment);
+    Line(segment).has_intarsection_with(*this);
     return Line(*this).has_intarsection_with(segment) && Line(segment).has_intarsection_with(*this);
 }
 
 Geometry::scalar_t Geometry::length(const Segment & segment) {
     return length(segment.point_0, segment.point_1);
+}
+
+Geometry::scalar_t Geometry::distance_between(const Segment & segment_0, const Segment & segment_1) {
+    Point points[4] = { segment_0.point_0, segment_0.point_1, segment_1.point_0, segment_1.point_1 };
+    scalar_t distance[4] = { points[0].distance_to(segment_1), points[1].distance_to(segment_1), 
+        points[2].distance_to(segment_0), points[3].distance_to(segment_0) };
+    scalar_t min_distance = distance[0];
+    for (int i = 1; i < 4; ++i) {
+        if (min_distance > distance[i]) {
+            min_distance = distance[i];
+        }
+    }
+    return min_distance;
 }
 
 std::ostream & Geometry::operator << (std::ostream & os, const Segment & segment) {
@@ -301,15 +375,24 @@ std::istream & Geometry::operator >> (std::istream & is, Segment & segmant) {
 
 Geometry::Line::Line(const Point & point_0, const Point & point_1) :
     origen(point_0), direction(Vector(point_0, point_1)) {
+    if (are_coincident(direction, Vector(0, 0))) {
+        throw "There is no opportunity to creat a line with direction == vector(0)";
+    }
 }
 
 Geometry::Line::Line(const Point & origen, const Vector & vector, const char * name_vector) :
     origen(origen) {
     if (!strcmp(name_vector, "direction")) {
         this->direction = vector;
+        if (are_coincident(vector, Vector(0, 0))) {
+            throw "There is no opportunity to creat a line with direction == vector(0)";
+        }
     } else if (!strcmp(name_vector, "normal")) {
         if (DIMENTION == 2) {
-            direction = Vector(-vector[1], vector[0]);
+            this->direction = Vector(-vector[1], vector[0]);
+            if (are_coincident(vector, Vector(0, 0))) {
+                throw "There is no opportunity to creat a line with direction == vector(0)";
+            }
         } else {
             throw "There is no opportunity to do define normal vector for line with DIMENTION != 2";
         }
@@ -323,13 +406,28 @@ Geometry::Line::Line(const coordinate_t & coefficient_of_x, const coordinate_t &
     if (DIMENTION != 2) {
         throw "There is no able to create line use equation Ax + By + C = 0 with DIMENTION != 2";
     }
-    direction = Vector(-coefficient_of_y, coefficient_of_x);
-    origen = Point(0, -absolute_term/coefficient_of_y);
+    this->direction = Vector(-coefficient_of_y, coefficient_of_x);
+    if (are_coincident(this->direction, Vector(0, 0))) {
+        throw "There is no opportunity to creat a line with direction == vector(0)";
+    }
+    if (coefficient_of_y) {
+        origen = Point(0, -absolute_term / coefficient_of_y);
+    }
+    else {
+        origen = Point(-absolute_term / coefficient_of_x, 0);
+    }
 }
 
 Geometry::Line::Line(const Segment & segment) :
     origen(segment.point_0),
-    direction(Vector(segment.point_0, segment.point_0)) {
+    direction(Vector(segment.point_0, segment.point_1)) {
+    if (are_coincident(this->direction, Vector(0, 0))) {
+        throw "There is no opportunity to creat a line with direction == vector(0)";
+    }
+}
+
+Geometry::Line::Line(const Ray & ray) :
+origen(ray.origen), direction(ray.direction) {
 }
 
 Geometry::Line & Geometry::Line::move(const Vector & vector) {
@@ -345,9 +443,13 @@ bool Geometry::Line::has_intarsection_with(const Segment & segment) const {
     if (are_skew(*this, Line(segment))) {
         return false;
     }
-    scalar_t area_0 = skew_product(segment.point_0.radius_vector, this->direction);
-    scalar_t area_1 = skew_product(segment.point_1.radius_vector, this->direction);
+    scalar_t area_0 = skew_product(Vector(segment.point_0, this->origen), this->direction);
+    scalar_t area_1 = skew_product(Vector(segment.point_1, this->origen), this->direction);
     return area_0 * area_1 <= 0;
+}
+
+Geometry::Vector Geometry::Line::get_direction() {
+    return this->direction;
 }
 
 bool Geometry::are_coincident(const Line & line_0, const Line & line_1) {
@@ -369,7 +471,8 @@ bool Geometry::are_skew(const Line & line_0, const Line & line_1) {
 }
 
 Geometry::Point Geometry::intersection(const Line & line_0, const Line & line_1) {
-    //TODO: insert solution for DIMENTION > 2;
+    // The solution is presented for DIMENTION == 2;
+    // TODO: insert solution for DIMENTION > 2;
     if (DIMENTION > 3) {
         throw "There is no opportunity to find point of intersection for lines with DIMENTION != 2";
     }
@@ -377,13 +480,16 @@ Geometry::Point Geometry::intersection(const Line & line_0, const Line & line_1)
         throw "The lines are not intersecting";
     }
     // r_intersection = r_0 + at  (t is coefficient, r_0 is origen, a is direction)
+    if (!(-line_0.direction[0] * line_1.direction[1] + line_0.direction[1] * line_1.direction[0])) {
+        throw "Attempt of division by zero";
+    }
     scalar_t coefficient = (line_1.direction[1] * (line_0.origen.radius_vector[0] - line_1.origen.radius_vector[0])
         - line_1.direction[1] * (line_0.origen.radius_vector[1] - line_1.origen.radius_vector[1])) /
-        (line_0.direction[0] * line_1.direction[1] - line_0.direction[1] * line_1.direction[0]);
+        (-line_0.direction[0] * line_1.direction[1] + line_0.direction[1] * line_1.direction[0]);
     return line_0.origen.radius_vector + line_0.direction * coefficient;
 }
 
-Geometry::scalar_t Geometry::distance_between_parallel(const Line & line_0, const Line & line_1) {
+Geometry::scalar_t Geometry::distance_between(const Line & line_0, const Line & line_1) {
     if (!are_parallel(line_0, line_1)) {
         throw "The lines are not parallel";
     }
@@ -404,8 +510,18 @@ std::istream & Geometry::operator >> (std::istream & is, Line & line) {
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //Class Ray: public Shape {};
 
+Geometry::Ray::Ray(const Point & origen, const Point & point_of_ray) :
+    origen(origen), direction(point_of_ray.radius_vector - origen.radius_vector) {
+    if (are_coincident(this->direction, Vector(0, 0))) {
+        throw "There is no opportunity to creat a segment with direction == vector(0)";
+    }
+}
+
 Geometry::Ray::Ray(const Point & origen, const Vector & direction) :
     origen(origen), direction(direction) {
+    if (are_coincident(this->direction, Vector(0, 0))) {
+        throw "There is no opportunity to creat a segment with direction == vector(0)";
+    }
 }
 
 Geometry::Ray & Geometry::Ray::move(const Vector & vector) {
@@ -413,9 +529,8 @@ Geometry::Ray & Geometry::Ray::move(const Vector & vector) {
     return *this;
 }
 
-bool Geometry::Ray::has_point(const Point & point) const { ///////////////////////////////////////////////////////////////////
-    scalar_t check_product = skew_product(origen.radius_vector, origen.radius_vector + direction);
-    return false;
+bool Geometry::Ray::has_point(const Point & point) const { 
+    return ((Line(*this).has_point(point)) && (are_co_directed(this->direction, Vector(this->origen, point))));
 }
 
 bool Geometry::Ray::has_intarsection_with(const Segment & segment) const ////////////////////////////////////////////////////////

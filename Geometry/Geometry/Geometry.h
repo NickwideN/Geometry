@@ -1,7 +1,6 @@
 #ifndef _NickwideN_Geometry_H
 #define _NickwideN_Geometry_H
 #include<iostream>
-#include<deque>
 //-------------------------------------------------------------------------------------------------
 //                          README.md is here: https://github.com/NickwideN/Geometry
 //-------------------------------------------------------------------------------------------------
@@ -54,7 +53,8 @@ namespace Geometry {
         friend double agl(const Vector & vector_0, const Vector & vector_1);
         friend bool are_collinear(const Vector & vector_0, const Vector & vector_1);
         friend bool are_coincident(const Vector & vector_0, const Vector & vector_1);
-        friend bool are_complanar(const Vector & vector_0, const Vector & vector_1, const Vector & vector_2); // discription only for DIMENTION < 3
+        friend bool are_complanar(const Vector & vector_0, const Vector & vector_1, const Vector & vector_2); 
+        friend bool are_co_directed(const Vector & vector_0, const Vector & vector_1);
         friend std::ostream & operator << (std::ostream & os, const Vector & vector);
         friend std::istream & operator >> (std::istream & is, Vector & vector);
     };
@@ -75,11 +75,14 @@ namespace Geometry {
     public:
         Point();
         Point(const coordinate_t & coor_0, const coordinate_t & coor_1 = default_value); //no konstruktors for Demention > 2//////////////////
-        Point(const Vector ragius_vector);
+        Point(const Vector radius_vector);
         Point & move(const Vector & vector) override;
         bool has_point(const Point & point) const override;
         bool has_intarsection_with(const Segment & segment) const override;
         friend scalar_t length(const Point & point_0, const Point & point_1);
+        scalar_t distance_to(const Line & line);
+        scalar_t distance_to(const Ray & ray);
+        scalar_t distance_to(const Segment & segment);
         friend std::ostream & operator << (std::ostream & os, const Point & vector);
         friend std::istream & operator >> (std::istream & is, Point & vector);
 
@@ -91,7 +94,7 @@ namespace Geometry {
         friend bool are_intersecting(const Line & line_0, const Line & line_1);
         friend bool are_skew(const Line & line_0, const Line & line_1);
         friend Point intersection(const Line & line_0, const Line & line_1);
-        friend scalar_t distance_between_parallel(const Line & line_0, const Line & line_1);
+        friend scalar_t distance_between(const Line & line_0, const Line & line_1);
     };
 
     class Segment : public Shape {
@@ -108,11 +111,13 @@ namespace Geometry {
         virtual bool has_intarsection_with(const Segment & segment) const override;
 
         friend scalar_t length(const Segment & segment);
+        friend scalar_t distance_between(const Segment & segment_0, const Segment & segment_1);
 
         friend std::ostream & operator << (std::ostream & os, const Segment & segment);
         friend std::istream & operator >> (std::istream & is, Segment & segmant);
 
         friend Line;
+        friend Point;
     };
 
     class Line : public Shape {
@@ -124,19 +129,24 @@ namespace Geometry {
         Line(const Point & origen, const Vector & vector, const char * name_vector = "direction"); // vector can be normal or direction
         Line(const coordinate_t & coefficient_of_x, const coordinate_t & coefficient_of_y, const coordinate_t & absolute_term);   // Ax + By + C = 0
         Line(const Segment & segmant);
+        Line(const Ray & ray);
 
         Line & move(const Vector & vector) override;
         bool has_point(const Point & point) const override;
         bool has_intarsection_with(const Segment & segment) const override;
 
+        Vector get_direction();
         friend bool are_coincident(const Line & line_0, const Line & line_1);
         friend bool are_parallel(const Line & line_0, const Line & line_1);
         friend bool are_intersecting(const Line & line_0, const Line & line_1);
         friend bool are_skew(const Line & line_0, const Line & line_1);
         friend Point intersection(const Line & line_0, const Line & line_1);
-        friend scalar_t distance_between_parallel(const Line & line_0, const Line & line_1);
+        friend scalar_t distance_between(const Line & line_0, const Line & line_1);
         friend std::ostream & operator << (std::ostream & os, const Line & line);
         friend std::istream & operator >> (std::istream & is, Line & line);
+
+        friend Segment;
+        friend Point;
     };
 
     class Ray : public Shape {
@@ -144,13 +154,17 @@ namespace Geometry {
         Point origen;
         Vector direction;
     public:
+        Ray(const Point & origen, const Point & point_of_ray);
         Ray(const Point & origen, const Vector & direction);
         Ray & move(const Vector & vector) override;
-        bool has_point(const Point & point) const override; //////////////////////////////////////////////////////////////
+        bool has_point(const Point & point) const override;
         bool has_intarsection_with(const Segment & segment) const override; ////////////////////////////////////////////////////
 
         friend std::ostream & operator << (std::ostream & os, const Ray & ray);
         friend std::istream & operator >> (std::istream & is, Ray & ray);
+
+        friend Line;
+        friend Point;
     };
 
     class Polygon : public Shape {

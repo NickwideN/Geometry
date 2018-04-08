@@ -1,44 +1,30 @@
 #include"Geometry.h"
 #include<iostream>
+#include<iomanip>
 using namespace Geometry;
 using namespace std;
+// F
+/*
 int main() {
-    Vector a;
-    Vector b(4, 3);
-    a = Vector(1, 1);
-    b = a + b;
-    b = a + Geometry::Vector(2, 4);
-    try {
-        std::cout << Geometry::vector_product(Geometry::Vector(6, 3), b) << std::endl;
-    }
-    catch (char * er) {
-        cout << er << endl;
-    }
-    Geometry::Vector c(-1, -1);
-    std::cout << c << '\n';
-    std::cout << agl(c, a) << '\n';
-    c[1];
-    Geometry::Point p(1, 4);
-    std::cout << p << std::endl;
-    p.move(c);
-    cout << p << endl << endl;
-    Point con_point = Vector(2, 3);
-    Segment segment(Point(1, 1), Point(3, 5));
-    cout << segment.has_point(con_point) << endl;
-    Point x(b);
-    Vector v(p, Point(2, 2));
-    cout << v << endl;
-    try {
-        a[10] = 1;
-    }
-    catch (char *) {
-        cout << "error index";
-    }
-    //Line l1(p, a, "j");
+    Segment a;
+    Segment b;
+    cin >> a;
+    cin >> b;
+    cout << (a.has_intarsection_with(b) ? "YES" : "NO");
     getchar();
-    getchar(); 
+    getchar();
     return 0;
 }
+*/
 
-
-
+// G
+int main() {
+    Segment a;
+    Segment b;
+    cin >> a;
+    cin >> b;
+    cout << setprecision(9) << fixed << distance_between(a, b);
+    getchar();
+    getchar();
+    return 0;
+}
