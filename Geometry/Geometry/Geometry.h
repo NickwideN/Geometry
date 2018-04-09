@@ -18,6 +18,7 @@ namespace Geometry {
     class Line;
     class Ray;
     class Polygon;
+
     class Vector {
     private:
         coordinate_t coordinates[DIMENTION];
@@ -173,13 +174,26 @@ namespace Geometry {
     private:
         Point* points;
         int points_cnt;
+        inline Polygon & define_points_cnt(const int & number_of_points);
+        inline Polygon & copy_points(const int & number_of_points, const Point * points);
     public:
         // проверка на непересечение сторон полигона
         Polygon();
+        Polygon(const Polygon & other);
+        Polygon(Polygon && other);
         Polygon(const int & number_of_points, const Point * points);
-        Polygon(const int number_of_points, ...);
+        Polygon(const int number_of_points, Point point_0, ...);
+        Polygon(const int & number_of_points);
         ~Polygon();
-        Polygon & add_point(const Point point);
+        Polygon & operator = (const Polygon & other);
+        Polygon & operator = (Polygon && other);
+        Polygon set_point_cnt(const int & point_cnt);
+        Polygon & add_point(const Point & point);
+        Polygon & remove_point();
+        int get_points_cnt();
+
+        Point operator [] (const int index) const;
+        Point & operator [] (const int index);
 
         Polygon & move(const Vector & vector) override;
         bool has_point(const Point & point) const override; ////////////////////////////////////////////////////////////////////////

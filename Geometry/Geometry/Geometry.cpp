@@ -477,12 +477,12 @@ Geometry::Point Geometry::intersection(const Line & line_0, const Line & line_1)
         throw "The lines are not intersecting";
     }
     // r_intersection = r_0 + at  (t is coefficient, r_0 is origen, a is direction)
-    if (!(-line_0.direction[0] * line_1.direction[1] + line_0.direction[1] * line_1.direction[0])) {
+    if (!(line_0.direction[0] * line_1.direction[1] - line_0.direction[1] * line_1.direction[0])) {
         throw "Attempt of division by zero";
     }
-    scalar_t coefficient = (line_1.direction[1] * (line_0.origen.radius_vector[0] - line_1.origen.radius_vector[0])
-        - line_1.direction[1] * (line_0.origen.radius_vector[1] - line_1.origen.radius_vector[1])) /
-        (-line_0.direction[0] * line_1.direction[1] + line_0.direction[1] * line_1.direction[0]);
+    scalar_t coefficient = (line_1.direction[0] * (line_0.origen.radius_vector[1] - line_1.origen.radius_vector[1])
+        - line_1.direction[1] * (line_0.origen.radius_vector[0] - line_1.origen.radius_vector[0])) /
+        (line_0.direction[0] * line_1.direction[1] - line_0.direction[1] * line_1.direction[0]);
     return line_0.origen.radius_vector + line_0.direction * coefficient;
 }
 
@@ -527,11 +527,15 @@ Geometry::Ray & Geometry::Ray::move(const Vector & vector) {
 }
 
 bool Geometry::Ray::has_point(const Point & point) const { 
-    return ((Line(*this).has_point(point)) && (are_co_directed(this->direction, Vector(this->origen, point))));
+    return ((Line(*this).has_point(point)) && 
+        (are_co_directed(this->direction, Vector(this->origen, point))));
 }
 
-bool Geometry::Ray::has_intarsection_with(const Segment & segment) const ////////////////////////////////////////////////////////
-{
+bool Geometry::Ray::has_intarsection_with(const Segment & segment) const {
+    Point inter_point = intersection(Line(segment), Line(*this));
+    if (segment.has_point(inter_point) && this->has_point(inter_point)) {
+        return true;
+    }
     return false;
 }
 
@@ -549,21 +553,113 @@ std::istream & Geometry::operator >> (std::istream & is, Ray & ray) {
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //Class Polygon: public Shape {};
 
+Geometry::Polygon & Geometry::Polygon::define_points_cnt(const int & number_of_points) {
+    this->points_cnt = number_of_points;
+    this->points = new Point[number_of_points];
+    return *this;
+}
+
+Geometry::Polygon & Geometry::Polygon::copy_points(const int & number_of_points, const Point * points) {
+    for (int i = 0; i < number_of_points; ++i) {
+        this->points[i] = points[i];
+    }
+    return *this;
+}
+
 Geometry::Polygon::Polygon() {
-    this->points_cnt = 1;
-    this->points = new Point[points_cnt];
+    this->define_points_cnt(1);
     this->points[0] = Point();
 }
 
+Geometry::Polygon::Polygon(const Polygon & other) {
+    this->define_points_cnt(other.points_cnt);
+    this->copy_points(this->points_cnt, other.points);
+}
+
+Geometry::Polygon::Polygon(Polygon && other) :
+    points_cnt(other.points_cnt), points(other.points) {
+    other.points_cnt = 0; other.points = 0;
+}
+
 Geometry::Polygon::Polygon(const int & number_of_points, const Point * points) {
-    this->points_cnt = number_of_points;
+    this->define_points_cnt(number_of_points);
+    this->copy_points(number_of_points, points);
+}
+
+Geometry::Polygon::Polygon(const int number_of_points, Point point_0, ...) { 
+    Point * pointer_point = &point_0;
+    this->define_points_cnt(number_of_points);
+    for (int i = 0; i < number_of_points; ++i) {
+        this->points[i] = *pointer_point;
+        ++pointer_point;
+    }
+}
+
+Geometry::Polygon::Polygon(const int & number_of_points) {
+    this->define_points_cnt(number_of_points);
     for (int i = 0; i < this->points_cnt; ++i) {
-        this->points[i] = points[i];
+        this->points[i] = Point();
     }
 }
 
 Geometry::Polygon::~Polygon() {
-    delete[] points;
+    delete[] this->points;
+}
+
+Geometry::Polygon & Geometry::Polygon::operator = (const Polygon & other) {
+    Point * tmp_points = new Point[other.points_cnt];
+    delete[] this->points;
+    this->points = tmp_points;
+    this->points_cnt = other.points_cnt;
+    this->copy_points(this->points_cnt, other.points);
+    return *this;
+}
+
+Geometry::Polygon & Geometry::Polygon::operator = (Polygon && other) {
+    delete[] this->points;
+    this->points = other.points;
+    this->points_cnt = other.points_cnt;
+    other.points = 0;
+    other.points_cnt = 0;
+    return *this;
+}
+
+Geometry::Polygon Geometry::Polygon::set_point_cnt(const int & point_cnt) {
+    Polygon new_polygon(point_cnt);
+    int min_point_cnt = (this->points_cnt < new_polygon.points_cnt ? this->points_cnt : new_polygon.points_cnt);
+    new_polygon.copy_points(min_point_cnt, this->points);
+    for (int i = min_point_cnt; i < new_polygon.points_cnt; ++i) {
+        new_polygon.points[i] = this->points[this->points_cnt - 1];
+    }
+    delete[] this->points;
+    return new_polygon;
+}
+
+Geometry::Polygon & Geometry::Polygon::add_point(const Point & point) {
+    Polygon new_poligon(this->points_cnt + 1);
+    new_poligon.copy_points(this->points_cnt, this->points);
+    new_poligon.points[new_poligon.points_cnt - 1] = point;
+    delete[] this->points;
+    return new_poligon;
+}
+
+Geometry::Polygon & Geometry::Polygon::remove_point() {
+    Polygon new_poligon(this->points_cnt - 1);
+    new_poligon.copy_points(this->points_cnt - 1, this->points);
+    delete[] this->points;
+    return new_poligon;
+}
+
+int Geometry::Polygon::get_points_cnt() {
+    return this->points_cnt;
+}
+
+Geometry::Point Geometry::Polygon::operator [] (const int index) const {
+    return this->points[index];
+}
+
+Geometry::Point & Geometry::Polygon::operator [] (const int index) {
+    return this->points[index];
 }
 
 Geometry::Polygon & Geometry::Polygon::move(const Vector & vector) {

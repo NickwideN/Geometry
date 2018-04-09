@@ -3,7 +3,7 @@
 #include<iomanip>
 using namespace Geometry;
 using namespace std;
-// F
+// F //wrong
 /*
 int main() {
     Segment a;
@@ -17,7 +17,7 @@ int main() {
 }
 */
 
-// G
+// G // wrong
 /*
 int main() {
     Segment a;
@@ -31,7 +31,7 @@ int main() {
 }
 */
 
-// E
+// E // wrong
 /*
 int main() {
     Point C;
@@ -48,7 +48,8 @@ int main() {
 }
 */
 
-// C
+// C true
+/*
 int main() {
     int coef[6];
     for (int i = 0; i < 6; ++i) {
@@ -67,14 +68,22 @@ int main() {
     getchar();
     return 0;
 }
+*/
 
+// Polygon
 
-/*
 int main() {
-    Polygon a;
-    cin >> a;
+    Point a(1, 2);
+    Point b(1, 4);
+    Point c(5, 3);
+    Point d(3, 7);
+    Point e(6, 2);
+    Point p[5] = { a, b, a, d, e };
+    Polygon pol1(5, p);
+    Polygon pol2(3, a, b, c);
+    pol1 = pol2;
+    cout << pol1[2];
     getchar();
     getchar();
     return 0;
 }
-*/
