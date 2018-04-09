@@ -151,15 +151,15 @@ Geometry::scalar_t Geometry::abs(const Vector & vector){
 }
 
 double Geometry::sin_agl(const Vector & vector_0, const Vector & vector_1) {
-    return (std::abs(skew_product(vector_0, vector_1)) / abs(vector_0) / abs(vector_1));
+    return (double(abs(skew_product(vector_0, vector_1))) / abs(vector_0) / abs(vector_1));
 }
 
 double Geometry::cos_agl(const Vector & vector_0, const Vector & vector_1) {
-    return ((vector_0 * vector_1) / abs(vector_0) / abs(vector_1));
+    return (double((vector_0 * vector_1)) / abs(vector_0) / abs(vector_1));
 }
 
 double Geometry::tan_agl(const Vector & vector_0, const Vector & vector_1) {
-    return (sin_agl(vector_0, vector_1) / cos_agl(vector_0, vector_1));
+    return (double(sin_agl(vector_0, vector_1)) / cos_agl(vector_0, vector_1));
 }
 
 double Geometry::agl(const Vector & vector_0, const Vector & vector_1) {
@@ -480,7 +480,7 @@ Geometry::Point Geometry::intersection(const Line & line_0, const Line & line_1)
     if (!(line_0.direction[0] * line_1.direction[1] - line_0.direction[1] * line_1.direction[0])) {
         throw "Attempt of division by zero";
     }
-    scalar_t coefficient = (line_1.direction[0] * (line_0.origen.radius_vector[1] - line_1.origen.radius_vector[1])
+    scalar_t coefficient = scalar_t(line_1.direction[0] * (line_0.origen.radius_vector[1] - line_1.origen.radius_vector[1])
         - line_1.direction[1] * (line_0.origen.radius_vector[0] - line_1.origen.radius_vector[0])) /
         (line_0.direction[0] * line_1.direction[1] - line_0.direction[1] * line_1.direction[0]);
     return line_0.origen.radius_vector + line_0.direction * coefficient;
@@ -586,7 +586,7 @@ Geometry::Polygon::Polygon(const int & number_of_points, const Point * points) {
     this->copy_points(number_of_points, points);
 }
 
-Geometry::Polygon::Polygon(const int number_of_points, Point point_0, ...) { 
+Geometry::Polygon::Polygon(const int number_of_points, Point point_0, ...) {
     Point * pointer_point = &point_0;
     this->define_points_cnt(number_of_points);
     for (int i = 0; i < number_of_points; ++i) {
@@ -654,6 +654,35 @@ int Geometry::Polygon::get_points_cnt() {
     return this->points_cnt;
 }
 
+bool Geometry::Polygon::is_convex() {
+    if (this->points_cnt < 3) {
+        return true;
+    }
+    scalar_t check_product = skew_product(Vector(this->points[this->points_cnt - 1], this->points[0]),
+        Vector(this->points[0], this->points[1]));
+    for (int i = 0; i < this->points_cnt - 2; ++i) {
+        if ((check_product * skew_product(Vector(this->points[i], this->points[i + 1]),
+            Vector(this->points[i + 1], this->points[i + 2]))) < 0) {
+            return false;
+        }
+    }
+    if ((check_product * skew_product(Vector(this->points[this->points_cnt - 2], this->points[this->points_cnt - 1]),
+        Vector(this->points[this->points_cnt - 1], this->points[0]))) < 0) {
+        return false;
+    }
+    return true;
+}
+
+Geometry::scalar_t Geometry::area(const Polygon & polygon) {
+    scalar_t area = 0;
+    for (int i = 0; i < polygon.points_cnt - 1; ++i) {
+        area += skew_product(polygon.points[i].radius_vector, polygon.points[i + 1].radius_vector);
+    }
+    area += skew_product(polygon.points[polygon.points_cnt - 1].radius_vector, polygon.points[0].radius_vector);
+    area = abs(area / 2);
+    return area;
+}
+
 Geometry::Point Geometry::Polygon::operator [] (const int index) const {
     return this->points[index];
 }
@@ -670,14 +699,24 @@ Geometry::Polygon & Geometry::Polygon::move(const Vector & vector) {
 }
 
 bool Geometry::Polygon::has_point(const Point & point) const {
-    bool poligon_contain_point = false;
-    return false;
+    // The solution is presented for cases when polygon is convex;
+    // TODO: insert solution for cases when polygon is convex;
+    /*if (!this->is_convex) {
+        throw "There is no opportunity to study a polygon if it is convex";
+    }*/
+    scalar_t sum_area = 0;
+    for (int i = 0; i < this->points_cnt - 1; ++i) {
+        sum_area += abs(skew_product(Vector(point, this->points[i]), Vector(point, this->points[i + 1])));
+    }
+    sum_area += abs(skew_product(Vector(point, this->points[this->points_cnt - 1]), Vector(point, this->points[0])));
+    sum_area /= 2;
+    return area(*this) == sum_area;
 }
 
-bool Geometry::Polygon::has_intarsection_with(const Segment & segment) const ///////////////////////////////////////////////////////////
-{
-    return false;
+bool Geometry::Polygon::has_intarsection_with(const Segment & segment) const {
+    return (this->has_point(segment.point_0) || this->has_point(segment.point_1));
 }
+
 
 std::ostream & Geometry::operator << (std::ostream & os, const Polygon & polygon) {
     for (int i = 0; i < polygon.points_cnt; ++i) {

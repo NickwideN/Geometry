@@ -27,9 +27,9 @@ namespace Geometry {
         template<typename user_t>
         Vector(const user_t coor_0, const user_t coor_1, const user_t coor_2, const user_t coor_3, ...);
         // only when all types are similar,
-        //doesn't have a cheking if number of coors is less than DIMENTION
+        // doesn't have a cheking if number of coors is less than DIMENTION
         Vector(const coordinate_t coor_0, const coordinate_t coor_1 = default_value, const coordinate_t coor_2 = default_value);
-        //let to pass several types
+        // let to pass several types
         Vector(const Point & point_0, const Point & point_1);
         Vector & operator += (const Vector & vector);
         friend Vector operator + (const Vector & vector_0, const Vector & vector_1);
@@ -64,9 +64,6 @@ namespace Geometry {
 
     class Shape {
     public:
-        virtual scalar_t getArea() {
-            return 0.0;
-        }
         virtual Shape & move(const Vector & vector) = 0;
         virtual bool has_point(const Point & point) const = 0;
         virtual bool has_intarsection_with(const Segment & segment) const = 0;
@@ -93,11 +90,13 @@ namespace Geometry {
         friend Segment;
         friend Line;
         friend Ray;
+        friend Polygon;
         friend bool are_coincident(const Line & line_0, const Line & line_1);
         friend bool are_intersecting(const Line & line_0, const Line & line_1);
         friend bool are_skew(const Line & line_0, const Line & line_1);
         friend Point intersection(const Line & line_0, const Line & line_1);
         friend scalar_t distance_between(const Line & line_0, const Line & line_1);
+        friend scalar_t area(const Polygon & polygon);
     };
 
     class Segment : public Shape {
@@ -105,6 +104,7 @@ namespace Geometry {
         Point point_0;
         Point point_1;
     public:
+
         Segment();
         Segment(const Point & point_0, const Point & point_1);
         Segment(const Point & origen, const Vector & direction, const scalar_t & length);
@@ -121,6 +121,7 @@ namespace Geometry {
 
         friend Line;
         friend Point;
+        friend Polygon;
     };
 
     class Line : public Shape {
@@ -150,6 +151,7 @@ namespace Geometry {
 
         friend Segment;
         friend Point;
+
     };
 
     class Ray : public Shape {
@@ -161,7 +163,7 @@ namespace Geometry {
         Ray(const Point & origen, const Vector & direction);
         Ray & move(const Vector & vector) override;
         bool has_point(const Point & point) const override;
-        bool has_intarsection_with(const Segment & segment) const override; ////////////////////////////////////////////////////
+        bool has_intarsection_with(const Segment & segment) const override; 
 
         friend std::ostream & operator << (std::ostream & os, const Ray & ray);
         friend std::istream & operator >> (std::istream & is, Ray & ray);
@@ -177,7 +179,6 @@ namespace Geometry {
         inline Polygon & define_points_cnt(const int & number_of_points);
         inline Polygon & copy_points(const int & number_of_points, const Point * points);
     public:
-        // проверка на непересечение сторон полигона
         Polygon();
         Polygon(const Polygon & other);
         Polygon(Polygon && other);
@@ -191,13 +192,15 @@ namespace Geometry {
         Polygon & add_point(const Point & point);
         Polygon & remove_point();
         int get_points_cnt();
+        friend scalar_t area(const Polygon & polygon);
+        bool is_convex();
 
         Point operator [] (const int index) const;
         Point & operator [] (const int index);
 
         Polygon & move(const Vector & vector) override;
-        bool has_point(const Point & point) const override; ////////////////////////////////////////////////////////////////////////
-        bool has_intarsection_with(const Segment & segment) const override; /////////////////////////////////////////////////////////
+        bool has_point(const Point & point) const override; 
+        bool has_intarsection_with(const Segment & segment) const override; 
 
         friend std::ostream & operator << (std::ostream & os, const Polygon & polygon);
         friend std::istream & operator >> (std::istream & is, Polygon & polygon);
@@ -207,7 +210,6 @@ namespace Geometry {
     
 template<typename user_t>
 inline Geometry::Vector::Vector(const user_t coor_0, const user_t coor_1, const user_t coor_2, const user_t coor_3, ...) {
-    //doesn't have a cheking if it inputs number of coors that less than DIMENTION
     user_t *pointer_coor = &coor_0;
     for (int i = 0; i < DIMENTION; ++i) {
         coordinates[i] = *pointer_coor;
