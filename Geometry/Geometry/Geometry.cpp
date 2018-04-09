@@ -244,12 +244,12 @@ bool Geometry::Point::has_intarsection_with(const Segment & segment) const {
     return segment.has_point(*this);
 }
 
-Geometry::scalar_t Geometry::Point::distance_to(const Line & line) {
+Geometry::scalar_t Geometry::Point::distance_to(const Line & line) const {
     Line parallel_line(*this, line.direction);
     return distance_between(line, parallel_line);
 }
 
-Geometry::scalar_t Geometry::Point::distance_to(const Ray & ray) {
+Geometry::scalar_t Geometry::Point::distance_to(const Ray & ray) const {
     // The solution is presented for DIMENTION == 2;
     // TODO: insert solution for DIMENTION > 2;
     if (DIMENTION > 2) {
@@ -265,7 +265,7 @@ Geometry::scalar_t Geometry::Point::distance_to(const Ray & ray) {
     }
 }
 
-Geometry::scalar_t Geometry::Point::distance_to(const Segment & segment) {
+Geometry::scalar_t Geometry::Point::distance_to(const Segment & segment) const {
     // The solution is presented for DIMENTION == 2;
     // TODO: insert solution for DIMENTION > 2;
     if (DIMENTION > 2) {
@@ -445,7 +445,7 @@ bool Geometry::Line::has_intarsection_with(const Segment & segment) const {
     return area_0 * area_1 <= 0;
 }
 
-Geometry::Vector Geometry::Line::get_direction() {
+Geometry::Vector Geometry::Line::get_direction() const {
     return this->direction;
 }
 
@@ -650,12 +650,12 @@ Geometry::Polygon & Geometry::Polygon::remove_point() {
     return new_poligon;
 }
 
-int Geometry::Polygon::get_points_cnt() {
+int Geometry::Polygon::get_points_cnt() const {
     return this->points_cnt;
 }
 
-bool Geometry::Polygon::is_convex() {
-    if (this->points_cnt < 3) {
+bool Geometry::Polygon::is_convex() const {
+    if (this->points_cnt < 4) {
         return true;
     }
     scalar_t check_product = skew_product(Vector(this->points[this->points_cnt - 1], this->points[0]),
@@ -716,7 +716,6 @@ bool Geometry::Polygon::has_point(const Point & point) const {
 bool Geometry::Polygon::has_intarsection_with(const Segment & segment) const {
     return (this->has_point(segment.point_0) || this->has_point(segment.point_1));
 }
-
 
 std::ostream & Geometry::operator << (std::ostream & os, const Polygon & polygon) {
     for (int i = 0; i < polygon.points_cnt; ++i) {

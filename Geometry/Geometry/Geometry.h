@@ -80,9 +80,9 @@ namespace Geometry {
         bool has_point(const Point & point) const override;
         bool has_intarsection_with(const Segment & segment) const override;
         friend scalar_t length(const Point & point_0, const Point & point_1);
-        scalar_t distance_to(const Line & line);
-        scalar_t distance_to(const Ray & ray);
-        scalar_t distance_to(const Segment & segment);
+        scalar_t distance_to(const Line & line) const;
+        scalar_t distance_to(const Ray & ray) const;
+        scalar_t distance_to(const Segment & segment) const;
         friend std::ostream & operator << (std::ostream & os, const Point & vector);
         friend std::istream & operator >> (std::istream & is, Point & vector);
 
@@ -139,7 +139,7 @@ namespace Geometry {
         bool has_point(const Point & point) const override;
         bool has_intarsection_with(const Segment & segment) const override;
 
-        Vector get_direction();
+        Vector get_direction() const;
         friend bool are_coincident(const Line & line_0, const Line & line_1);
         friend bool are_parallel(const Line & line_0, const Line & line_1);
         friend bool are_intersecting(const Line & line_0, const Line & line_1);
@@ -191,9 +191,9 @@ namespace Geometry {
         Polygon set_point_cnt(const int & point_cnt);
         Polygon & add_point(const Point & point);
         Polygon & remove_point();
-        int get_points_cnt();
+        int get_points_cnt() const;
         friend scalar_t area(const Polygon & polygon);
-        bool is_convex();
+        bool is_convex() const;
 
         Point operator [] (const int index) const;
         Point & operator [] (const int index);

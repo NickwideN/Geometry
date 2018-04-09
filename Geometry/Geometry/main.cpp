@@ -24,7 +24,7 @@ return 0;
 }
 */
 
-// C true
+// C right
 /*
 int main() {
 int coef[6];
@@ -45,7 +45,7 @@ getchar();
 return 0;
 }
 */
-// D
+// D  right
 /*
 int main() {
     Point C;
@@ -109,8 +109,8 @@ int main() {
 }
 */
 
-// H
-/*
+// H   wrong
+
 int main() {
     int points_cnt;
     cin >> points_cnt;
@@ -121,9 +121,9 @@ int main() {
     getchar();
     return 0;
 }
-*/
 
-// I
+
+// I  wrong
 /*
 int main() {
     int points_cnt;
@@ -139,7 +139,7 @@ int main() {
 }
 */
 
-// J
+// J  true
 /*
 int main() {
     int points_cnt;
