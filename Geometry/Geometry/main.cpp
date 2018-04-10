@@ -64,7 +64,7 @@ int main() {
 }
 */
 
-// E // wrong
+// E // right
 /*
 int main() {
 Point C;
@@ -81,7 +81,7 @@ return 0;
 }
 */
 
-// F //wrong
+// F //right
 /*
 int main() {
     Segment a;
@@ -95,7 +95,7 @@ int main() {
 }
 */
 
-// G // wrong
+// G // right
 /*
 int main() {
     Segment a;
@@ -108,7 +108,6 @@ int main() {
     return 0;
 }
 */
-
 // H   wrong
 
 int main() {
@@ -121,7 +120,6 @@ int main() {
     getchar();
     return 0;
 }
-
 
 // I  wrong
 /*

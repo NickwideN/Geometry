@@ -105,7 +105,7 @@ Geometry::scalar_t Geometry::scalar_product(const Vector & vector_0, const Vecto
 Geometry::Vector Geometry::vector_product(const Vector & vector_0, const Vector & vector_1) {
     if (DIMENTION != 3) {
         throw "There is no opportunity to take vector product with DIMENTION != 3. For getting an area of parallelogram\
- on the vectors use function \"skew_product(Vector vector1, Vector vector2)\"";
+ on the vectors use function \"skew_product(vector1, vector2)\"";
     }
     Vector new_vector;
     new_vector[0] = vector_0[1] * vector_1[2] - vector_0[2] * vector_1[1];
@@ -125,6 +125,13 @@ Geometry::scalar_t Geometry::skew_product(const Vector & vector_0, const Vector 
     } else { // DIMENTION == 3
         return abs(vector_product(vector_0, vector_1));
     }
+}
+
+Geometry::Vector Geometry::normal_vector(const Vector & vector) {
+    if (DIMENTION != 2) {
+        throw "There is no opportunity to define normal vector to one vector if DIMENTION > 2";
+    }
+    return Vector(-vector[1], vector[0]);
 }
 
 Geometry::coordinate_t Geometry::Vector::operator[] (const int index) const {
@@ -236,7 +243,7 @@ Geometry::Point & Geometry::Point::move(const Vector & vector) {
     return *this;
 }
 
-bool Geometry::Point::has_point(const Point & point) const{
+bool Geometry::Point::has_point(const Point & point) const {
     return are_coincident(this->radius_vector, point.radius_vector);
 }
 
@@ -250,34 +257,34 @@ Geometry::scalar_t Geometry::Point::distance_to(const Line & line) const {
 }
 
 Geometry::scalar_t Geometry::Point::distance_to(const Ray & ray) const {
-    // The solution is presented for DIMENTION == 2;
-    // TODO: insert solution for DIMENTION > 2;
-    if (DIMENTION > 2) {
-        throw "There is no opportunity to take distance from point to ray with DIMENTION > 2";
-    }
-    Line parallel_line(*this, ray.direction);
-    Line normal_line(ray.origen, Vector(-ray.direction[1], ray.direction[0]));
-    Point inter_point = intersection(parallel_line, normal_line);
-    if (are_co_directed(Vector(inter_point, *this), ray.direction)) {
-        return this->distance_to(Line(ray));
-    } else {
+    if (scalar_product(ray.direction, Vector(ray.origen, *this)) < 0) {
         return length(*this, ray.origen);
+    }
+    else {
+        return this->distance_to(Line(ray));
     }
 }
 
 Geometry::scalar_t Geometry::Point::distance_to(const Segment & segment) const {
-    // The solution is presented for DIMENTION == 2;
-    // TODO: insert solution for DIMENTION > 2;
-    if (DIMENTION > 2) {
-        throw "There is no opportunity to take distance from point to segment with DIMENTION > 2";
-    }
-    if (Line(*this, Vector(-Line(segment).direction[1], Line(segment).direction[0])).has_intarsection_with(segment)) {
+    scalar_t sc_product_0 = scalar_product(Line(segment).direction, Vector(segment.point_0, *this));
+    scalar_t sc_product_1 = scalar_product(Line(segment).direction, Vector(segment.point_1, *this));
+    if (sc_product_0 * sc_product_1 <= 0) {
         return this->distance_to(Line(segment));
-    } else {
+    }
+    else {
         scalar_t distance_to_0 = length(*this, segment.point_0);
         scalar_t distance_to_1 = length(*this, segment.point_1);
         return (distance_to_0 < distance_to_1 ? distance_to_0 : distance_to_1);
     }
+}
+
+bool Geometry::Point::operator == (const Point & other) const {
+    for (int i = 0; i < DIMENTION; ++i) {
+        if (this->radius_vector[i] != other.radius_vector[i]) {
+            return false;
+        }
+    }
+    return true;
 }
 
 Geometry::scalar_t Geometry::length(const Point & point_0, const Point & point_1) {
@@ -318,25 +325,28 @@ Geometry::Segment & Geometry::Segment::move(const Vector & vector) {
 }
 
 bool Geometry::Segment::has_point(const Point & point) const {
-    Segment tmp_seg = *this;
-    Point tmp_point = point;
-    if (skew_product(tmp_seg.point_0.radius_vector, tmp_seg.point_1.radius_vector) == 0) {
-        Vector move_vector(1, 1);
-        if (are_collinear(move_vector, Line(tmp_seg).direction)) {
-            move_vector = Vector(1, 2);
-        }
-        tmp_point.move(move_vector);
-        tmp_seg.move(move_vector);
-    }
-    return (std::abs(skew_product(tmp_seg.point_0.radius_vector, tmp_point.radius_vector)) + 
-                std::abs(skew_product(tmp_point.radius_vector, tmp_seg.point_1.radius_vector)) == 
-                    std::abs(skew_product(tmp_seg.point_0.radius_vector, tmp_seg.point_1.radius_vector)));
+    return are_co_directed(Vector(this->point_0, point), Vector(point, this->point_1));
 }
 
 bool Geometry::Segment::has_intarsection_with(const Segment & segment) const {
-    Line(*this).has_intarsection_with(segment);
-    Line(segment).has_intarsection_with(*this);
+    if (segment.is_point()) {
+        return this->has_point(segment.point_0);
+    }
+    if (this->is_point()) {
+        return segment.has_point(this->point_0);
+    }
+    if (are_coincident(Line(segment), Line(*this))) {
+        if (this->has_point(segment.point_0) || this->has_point(segment.point_1)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
     return Line(*this).has_intarsection_with(segment) && Line(segment).has_intarsection_with(*this);
+}
+
+bool Geometry::Segment::is_point() const {
+    return this->point_0 == this->point_1;
 }
 
 Geometry::scalar_t Geometry::length(const Segment & segment) {
@@ -344,9 +354,11 @@ Geometry::scalar_t Geometry::length(const Segment & segment) {
 }
 
 Geometry::scalar_t Geometry::distance_between(const Segment & segment_0, const Segment & segment_1) {
-    Point points[4] = { segment_0.point_0, segment_0.point_1, segment_1.point_0, segment_1.point_1 };
-    scalar_t distance[4] = { points[0].distance_to(segment_1), points[1].distance_to(segment_1), 
-        points[2].distance_to(segment_0), points[3].distance_to(segment_0) };
+    if (segment_0.has_intarsection_with(segment_1)) {
+        return 0;
+    }
+    scalar_t distance[4] = { segment_0.point_0.distance_to(segment_1), segment_0.point_1.distance_to(segment_1),
+        segment_1.point_0.distance_to(segment_0), segment_1.point_1.distance_to(segment_0) };
     scalar_t min_distance = distance[0];
     for (int i = 1; i < 4; ++i) {
         if (min_distance > distance[i]) {
@@ -437,6 +449,9 @@ bool Geometry::Line::has_point(const Point & point) const {
 }
 
 bool Geometry::Line::has_intarsection_with(const Segment & segment) const {
+    if (segment.is_point()) {
+        return this->has_point(segment.point_0);
+    }
     if (are_skew(*this, Line(segment))) {
         return false;
     }
@@ -531,7 +546,10 @@ bool Geometry::Ray::has_point(const Point & point) const {
         (are_co_directed(this->direction, Vector(this->origen, point))));
 }
 
-bool Geometry::Ray::has_intarsection_with(const Segment & segment) const {
+bool Geometry::Ray::has_intarsection_with(const Segment & segment) const { 
+    if (segment.is_point()) {
+        return this->has_point(segment.point_0);
+    }
     Point inter_point = intersection(Line(segment), Line(*this));
     if (segment.has_point(inter_point) && this->has_point(inter_point)) {
         return true;

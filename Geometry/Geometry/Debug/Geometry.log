@@ -1,9 +1,7 @@
-﻿  Geometry.cpp
+﻿  main.cpp
+  Geometry.cpp
   Создание кода...
-d:\с++\geometry\geometry\geometry\geometry.cpp(650): warning C4172: возвращение адреса локальной или временной переменной : new_poligon
-d:\с++\geometry\geometry\geometry\geometry.cpp(643): warning C4172: возвращение адреса локальной или временной переменной : new_poligon
-  Компиляция...
-  main.cpp
-  Создание кода...
+d:\с++\geometry\geometry\geometry\geometry.cpp(658): warning C4172: возвращение адреса локальной или временной переменной : new_poligon
+d:\с++\geometry\geometry\geometry\geometry.cpp(665): warning C4172: возвращение адреса локальной или временной переменной : new_poligon
   Geometry.vcxproj -> D:\С++\Geometry\Geometry\Debug\Geometry.exe
   Geometry.vcxproj -> D:\С++\Geometry\Geometry\Debug\Geometry.pdb (Partial PDB)

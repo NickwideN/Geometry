@@ -47,6 +47,7 @@ namespace Geometry {
         friend scalar_t scalar_product(const Vector & vector_0, const Vector & vector_1);
         friend Vector vector_product(const Vector & vector_0, const Vector & vector_1);
         friend coordinate_t skew_product(const Vector & vector_0, const Vector & vector_1);
+        friend Vector normal_vector(const Vector & vector);
         coordinate_t operator [] (const int index) const;
         coordinate_t & operator [] (const int index);
         friend scalar_t abs(const Vector & vector);
@@ -76,13 +77,17 @@ namespace Geometry {
         Point();
         Point(const coordinate_t & coor_0, const coordinate_t & coor_1 = default_value); //no konstruktors for Demention > 2//////////////////
         Point(const Vector radius_vector);
+
         Point & move(const Vector & vector) override;
         bool has_point(const Point & point) const override;
         bool has_intarsection_with(const Segment & segment) const override;
+
         friend scalar_t length(const Point & point_0, const Point & point_1);
         scalar_t distance_to(const Line & line) const;
         scalar_t distance_to(const Ray & ray) const;
         scalar_t distance_to(const Segment & segment) const;
+        bool operator == (const Point & other) const;
+
         friend std::ostream & operator << (std::ostream & os, const Point & vector);
         friend std::istream & operator >> (std::istream & is, Point & vector);
 
@@ -104,7 +109,6 @@ namespace Geometry {
         Point point_0;
         Point point_1;
     public:
-
         Segment();
         Segment(const Point & point_0, const Point & point_1);
         Segment(const Point & origen, const Vector & direction, const scalar_t & length);
@@ -115,12 +119,14 @@ namespace Geometry {
 
         friend scalar_t length(const Segment & segment);
         friend scalar_t distance_between(const Segment & segment_0, const Segment & segment_1);
+        bool is_point() const;
 
         friend std::ostream & operator << (std::ostream & os, const Segment & segment);
         friend std::istream & operator >> (std::istream & is, Segment & segmant);
 
         friend Line;
         friend Point;
+        friend Ray;
         friend Polygon;
     };
 
