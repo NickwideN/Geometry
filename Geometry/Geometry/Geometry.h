@@ -200,6 +200,8 @@ namespace Geometry {
         int get_points_cnt() const;
         friend scalar_t area(const Polygon & polygon);
         bool is_convex() const;
+        bool has_self_intersection() const;
+        bool is_star() const;
 
         Point operator [] (const int index) const;
         Point & operator [] (const int index);

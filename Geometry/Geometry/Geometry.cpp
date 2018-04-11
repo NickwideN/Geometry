@@ -676,9 +676,20 @@ bool Geometry::Polygon::is_convex() const {
     if (this->points_cnt < 4) {
         return true;
     }
+    if (this->is_star()) {
+        return false;
+    }
     scalar_t check_product = skew_product(Vector(this->points[this->points_cnt - 1], this->points[0]),
         Vector(this->points[0], this->points[1]));
-    for (int i = 0; i < this->points_cnt - 2; ++i) {
+    int check_index = 0;
+    for (; check_index < this->points_cnt - 2 && check_product == 0; check_index++) {
+        check_product = skew_product(Vector(this->points[check_index], this->points[check_index + 1]),
+            Vector(this->points[check_index + 1], this->points[check_index + 2]));
+    }
+    if (!check_product) {
+        return true;
+    }
+    for (int i = check_index; i < this->points_cnt - 2; ++i) {
         if ((check_product * skew_product(Vector(this->points[i], this->points[i + 1]),
             Vector(this->points[i + 1], this->points[i + 2]))) < 0) {
             return false;
@@ -689,6 +700,50 @@ bool Geometry::Polygon::is_convex() const {
         return false;
     }
     return true;
+}
+
+bool Geometry::Polygon::has_self_intersection() const {
+    if (this->points_cnt < 4) {
+        return false;
+    }
+    Segment * segments = new Segment[this->points_cnt];
+    for (int i = 0; i < this->points_cnt - 1; ++i) {
+        segments[i] = Segment(this->points[i], this->points[i + 1]);
+    }
+    segments[this->points_cnt - 1] = Segment(this->points[this->points_cnt - 1], this->points[0]);
+    for (int i = 0; i < this->points_cnt - 1; ++i) {
+        for (int j = i + 2; j < this->points_cnt; ++j) {
+            if (i == 0 && j == this->points_cnt - 1) {
+                continue;
+            }
+            if (segments[i].has_intarsection_with(segments[j])) {
+                delete[] segments;
+                return true;
+            }
+        }
+    }
+    delete[] segments;
+    return false;
+}
+
+bool Geometry::Polygon::is_star() const {
+    // check only necessary condition 
+    if (this->points_cnt < 5) {
+        return false;
+    }
+    Segment * segments = new Segment[this->points_cnt];
+    for (int i = 0; i < this->points_cnt - 1; ++i) {
+        segments[i] = Segment(this->points[i], this->points[i + 1]);
+    }
+    segments[this->points_cnt - 1] = Segment(this->points[this->points_cnt - 1], this->points[0]);
+    for (int i = 2; i < this->points_cnt - 1; ++i) {
+        if (segments[0].has_intarsection_with(segments[i])) {
+            delete[] segments;
+            return true;
+        }
+    }
+    delete[] segments;
+    return false;
 }
 
 Geometry::scalar_t Geometry::area(const Polygon & polygon) {
