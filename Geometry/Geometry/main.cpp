@@ -153,8 +153,13 @@ int main() {
 
 // K
 int main() {
-
-
+    int points_cnt;
+    cin >> points_cnt;
+    Polygon pol(points_cnt);
+    cin >> pol;
+    Polygon convex_hull_pol = convex_hull(pol);
+    cout << convex_hull_pol << '\n';
+    cout << setprecision(1) << fixed << area(convex_hull_pol);
     getchar();
     getchar();
     return 0;

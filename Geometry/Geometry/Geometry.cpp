@@ -854,8 +854,9 @@ Geometry::Polygon Geometry::convex_hull(const Polygon & polygon) {
             ++curr_vector;
         }
     }
-    if (skew_product(*curr_vector - **last_good_vector,
-        sorted_vectors[0] - *curr_vector) > 0) {
+    scalar_t tmp_skew_product = skew_product(*curr_vector - **last_good_vector,
+        sorted_vectors[0] - *curr_vector);
+    if (tmp_skew_product > 0 || (last_good_vector == good_vectors && tmp_skew_product == 0)) {
         last_good_vector[1] = curr_vector;
         ++last_good_vector;
         ++good_vectors_cnt;
@@ -928,9 +929,10 @@ bool Geometry::Polygon::has_intarsection_with(const Segment & segment) const {
 }
 
 std::ostream & Geometry::operator << (std::ostream & os, const Polygon & polygon) {
-    for (int i = 0; i < polygon.points_cnt; ++i) {
-        os << "point_" << i << ": " << polygon.points[i] << " ";
+    for (int i = 0; i < polygon.points_cnt - 1; ++i) {
+        os << polygon.points[i] << '\n';
     }
+    os << polygon.points[polygon.points_cnt - 1];
     return os;
 }
 

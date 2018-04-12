@@ -1,8 +1,3 @@
 ﻿  main.cpp
-  Geometry.cpp
-  Создание кода...
-d:\с++\geometry\geometry\geometry\geometry.cpp(679): warning C4172: возвращение адреса локальной или временной переменной : new_poligon
-d:\с++\geometry\geometry\geometry\geometry.cpp(686): warning C4172: возвращение адреса локальной или временной переменной : new_poligon
-d:\с++\geometry\geometry\geometry\geometry.cpp(823): warning C4715: Geometry::compare_vectors: значение возвращается не при всех путях выполнения
   Geometry.vcxproj -> D:\С++\Geometry\Geometry\Debug\Geometry.exe
   Geometry.vcxproj -> D:\С++\Geometry\Geometry\Debug\Geometry.pdb (Partial PDB)
