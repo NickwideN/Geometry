@@ -2,6 +2,7 @@
 #include<iostream>
 #include<cstring>    // strcmp
 #include<cmath>      // sqrt
+#include<algorithm>  // qsort
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //Class Vector {};
@@ -157,20 +158,20 @@ Geometry::scalar_t Geometry::abs(const Vector & vector){
     return abs;
 }
 
-double Geometry::sin_agl(const Vector & vector_0, const Vector & vector_1) {
+double Geometry::sin(const Vector & vector_0, const Vector & vector_1) {
     return (double(abs(skew_product(vector_0, vector_1))) / abs(vector_0) / abs(vector_1));
 }
 
-double Geometry::cos_agl(const Vector & vector_0, const Vector & vector_1) {
+double Geometry::cos(const Vector & vector_0, const Vector & vector_1) {
     return (double((vector_0 * vector_1)) / abs(vector_0) / abs(vector_1));
 }
 
-double Geometry::tan_agl(const Vector & vector_0, const Vector & vector_1) {
-    return (double(sin_agl(vector_0, vector_1)) / cos_agl(vector_0, vector_1));
+double Geometry::tan(const Vector & vector_0, const Vector & vector_1) {
+    return (double(sin(vector_0, vector_1)) / cos(vector_0, vector_1));
 }
 
 double Geometry::agl(const Vector & vector_0, const Vector & vector_1) {
-    return acos(cos_agl(vector_0, vector_1));
+    return acos(cos(vector_0, vector_1));
 }
 
 bool Geometry::are_collinear(const Vector & vector_0, const Vector & vector_1) {
@@ -207,6 +208,15 @@ bool Geometry::are_co_directed(const Vector & vector_0, const Vector & vector_1)
         return true;
     }
     return false;
+}
+
+bool Geometry::Vector::is_zero() {
+    for (int i = 0; i < DIMENTION; ++i) {
+        if (this->coordinates[i]) {
+            return false;
+        }
+    }
+    return true;
 }
 
 std::ostream & Geometry::operator << (std::ostream & os, const Vector & vector) {
@@ -257,8 +267,8 @@ Geometry::scalar_t Geometry::Point::distance_to(const Line & line) const {
 }
 
 Geometry::scalar_t Geometry::Point::distance_to(const Ray & ray) const {
-    if (scalar_product(ray.direction, Vector(ray.origen, *this)) < 0) {
-        return length(*this, ray.origen);
+    if (scalar_product(ray.direction, Vector(ray.origin, *this)) < 0) {
+        return length(*this, ray.origin);
     }
     else {
         return this->distance_to(Line(ray));
@@ -313,9 +323,9 @@ Geometry::Segment::Segment(const Point & point_0, const Point & point_1) :
     point_0(point_0), point_1(point_1) {
 }
 
-Geometry::Segment::Segment(const Point & origen, const Vector & direction, const scalar_t & length)
-    : point_0(origen) {
-    this->point_1 = origen.radius_vector + direction / abs(direction) * length;
+Geometry::Segment::Segment(const Point & origin, const Vector & direction, const scalar_t & length)
+    : point_0(origin) {
+    this->point_1 = origin.radius_vector + direction / abs(direction) * length;
 }
 
 Geometry::Segment & Geometry::Segment::move(const Vector & vector) {
@@ -343,6 +353,10 @@ bool Geometry::Segment::has_intarsection_with(const Segment & segment) const {
         }
     }
     return Line(*this).has_intarsection_with(segment) && Line(segment).has_intarsection_with(*this);
+}
+
+bool Geometry::Segment::has_intarsection_with(const Ray & ray) const {
+    return ray.has_intarsection_with(*this);
 }
 
 bool Geometry::Segment::is_point() const {
@@ -383,14 +397,14 @@ std::istream & Geometry::operator >> (std::istream & is, Segment & segmant) {
 //Class Line: public Shape {};
 
 Geometry::Line::Line(const Point & point_0, const Point & point_1) :
-    origen(point_0), direction(Vector(point_0, point_1)) {
+    origin(point_0), direction(Vector(point_0, point_1)) {
     if (are_coincident(direction, Vector(0, 0))) {
         throw "There is no opportunity to creat a line with direction == vector(0)";
     }
 }
 
-Geometry::Line::Line(const Point & origen, const Vector & vector, const char * name_vector) :
-    origen(origen) {
+Geometry::Line::Line(const Point & origin, const Vector & vector, const char * name_vector) :
+    origin(origin) {
     if (!strcmp(name_vector, "direction")) {
         this->direction = vector;
         if (are_coincident(vector, Vector(0, 0))) {
@@ -420,15 +434,15 @@ Geometry::Line::Line(const coordinate_t & coefficient_of_x, const coordinate_t &
         throw "There is no opportunity to creat a line with direction == vector(0)";
     }
     if (coefficient_of_y) {
-        origen = Point(0, -absolute_term / coefficient_of_y);
+        origin = Point(0, -absolute_term / coefficient_of_y);
     }
     else {
-        origen = Point(-absolute_term / coefficient_of_x, 0);
+        origin = Point(-absolute_term / coefficient_of_x, 0);
     }
 }
 
 Geometry::Line::Line(const Segment & segment) :
-    origen(segment.point_0),
+    origin(segment.point_0),
     direction(Vector(segment.point_0, segment.point_1)) {
     if (are_coincident(this->direction, Vector(0, 0))) {
         throw "There is no opportunity to creat a line with direction == vector(0)";
@@ -436,16 +450,16 @@ Geometry::Line::Line(const Segment & segment) :
 }
 
 Geometry::Line::Line(const Ray & ray) :
-origen(ray.origen), direction(ray.direction) {
+origin(ray.origin), direction(ray.direction) {
 }
 
 Geometry::Line & Geometry::Line::move(const Vector & vector) {
-    this->origen.move(vector);
+    this->origin.move(vector);
     return *this;
 }
 
 bool Geometry::Line::has_point(const Point & point) const {
-    return are_collinear(direction, origen.radius_vector - point.radius_vector);
+    return are_collinear(direction, origin.radius_vector - point.radius_vector);
 }
 
 bool Geometry::Line::has_intarsection_with(const Segment & segment) const {
@@ -455,8 +469,8 @@ bool Geometry::Line::has_intarsection_with(const Segment & segment) const {
     if (are_skew(*this, Line(segment))) {
         return false;
     }
-    scalar_t area_0 = skew_product(Vector(segment.point_0, this->origen), this->direction);
-    scalar_t area_1 = skew_product(Vector(segment.point_1, this->origen), this->direction);
+    scalar_t area_0 = skew_product(Vector(segment.point_0, this->origin), this->direction);
+    scalar_t area_1 = skew_product(Vector(segment.point_1, this->origin), this->direction);
     return area_0 * area_1 <= 0;
 }
 
@@ -466,7 +480,7 @@ Geometry::Vector Geometry::Line::get_direction() const {
 
 bool Geometry::are_coincident(const Line & line_0, const Line & line_1) {
     return are_parallel(line_0, line_1) && 
-        are_collinear(line_0.origen.radius_vector - line_1.origen.radius_vector, line_0.direction);
+        are_collinear(line_0.origin.radius_vector - line_1.origin.radius_vector, line_0.direction);
 }
 
 bool Geometry::are_parallel(const Line & line_0, const Line & line_1) {
@@ -474,12 +488,12 @@ bool Geometry::are_parallel(const Line & line_0, const Line & line_1) {
 }
 
 bool Geometry::are_intersecting(const Line & line_0, const Line & line_1){
-    return are_complanar(line_0.direction, line_1.direction, line_0.origen.radius_vector - line_1.origen.radius_vector) && 
+    return are_complanar(line_0.direction, line_1.direction, line_0.origin.radius_vector - line_1.origin.radius_vector) && 
         !are_parallel(line_0, line_1);
 }
 
 bool Geometry::are_skew(const Line & line_0, const Line & line_1) {
-    return !are_complanar(line_0.direction, line_1.direction, line_0.origen.radius_vector - line_1.origen.radius_vector);
+    return !are_complanar(line_0.direction, line_1.direction, line_0.origin.radius_vector - line_1.origin.radius_vector);
 }
 
 Geometry::Point Geometry::intersection(const Line & line_0, const Line & line_1) {
@@ -491,30 +505,30 @@ Geometry::Point Geometry::intersection(const Line & line_0, const Line & line_1)
     if (!are_intersecting(line_0, line_1)) {
         throw "The lines are not intersecting";
     }
-    // r_intersection = r_0 + at  (t is coefficient, r_0 is origen, a is direction)
+    // r_intersection = r_0 + at  (t is coefficient, r_0 is origin, a is direction)
     if (!(line_0.direction[0] * line_1.direction[1] - line_0.direction[1] * line_1.direction[0])) {
         throw "Attempt of division by zero";
     }
-    scalar_t coefficient = scalar_t(line_1.direction[0] * (line_0.origen.radius_vector[1] - line_1.origen.radius_vector[1])
-        - line_1.direction[1] * (line_0.origen.radius_vector[0] - line_1.origen.radius_vector[0])) /
+    scalar_t coefficient = scalar_t(line_1.direction[0] * (line_0.origin.radius_vector[1] - line_1.origin.radius_vector[1])
+        - line_1.direction[1] * (line_0.origin.radius_vector[0] - line_1.origin.radius_vector[0])) /
         (line_0.direction[0] * line_1.direction[1] - line_0.direction[1] * line_1.direction[0]);
-    return line_0.origen.radius_vector + line_0.direction * coefficient;
+    return line_0.origin.radius_vector + line_0.direction * coefficient;
 }
 
 Geometry::scalar_t Geometry::distance_between(const Line & line_0, const Line & line_1) {
     if (!are_parallel(line_0, line_1)) {
         throw "The lines are not parallel";
     }
-    return abs(skew_product(line_0.origen.radius_vector - line_1.origen.radius_vector, line_0.direction) / abs(line_0.direction));
+    return abs(skew_product(line_0.origin.radius_vector - line_1.origin.radius_vector, line_0.direction) / abs(line_0.direction));
 }
 
 std::ostream & Geometry::operator << (std::ostream & os, const Line & line) {
-    os << "origen: " << line.origen << " direction: " << line.direction;
+    os << "origin: " << line.origin << " direction: " << line.direction;
     return os;
 }
 
 std::istream & Geometry::operator >> (std::istream & is, Line & line) {
-    is >> line.origen >> line.direction;
+    is >> line.origin >> line.direction;
     return is;
 }
 
@@ -522,55 +536,58 @@ std::istream & Geometry::operator >> (std::istream & is, Line & line) {
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //Class Ray: public Shape {};
 
-Geometry::Ray::Ray(const Point & origen, const Point & point_of_ray) :
-    origen(origen), direction(point_of_ray.radius_vector - origen.radius_vector) {
+Geometry::Ray::Ray(const Point & origin, const Point & point_of_ray) :
+    origin(origin), direction(point_of_ray.radius_vector - origin.radius_vector) {
     if (are_coincident(this->direction, Vector(0, 0))) {
         throw "There is no opportunity to creat a segment with direction == vector(0)";
     }
 }
 
-Geometry::Ray::Ray(const Point & origen, const Vector & direction) :
-    origen(origen), direction(direction) {
+Geometry::Ray::Ray(const Point & origin, const Vector & direction) :
+    origin(origin), direction(direction) {
     if (are_coincident(this->direction, Vector(0, 0))) {
         throw "There is no opportunity to creat a segment with direction == vector(0)";
     }
 }
 
 Geometry::Ray & Geometry::Ray::move(const Vector & vector) {
-    this->origen.move(vector);
+    this->origin.move(vector);
     return *this;
 }
 
 bool Geometry::Ray::has_point(const Point & point) const { 
     return ((Line(*this).has_point(point)) && 
-        (are_co_directed(this->direction, Vector(this->origen, point))));
+        (are_co_directed(this->direction, Vector(this->origin, point))));
 }
 
 bool Geometry::Ray::has_intarsection_with(const Segment & segment) const { 
     if (segment.is_point()) {
         return this->has_point(segment.point_0);
     }
-    Point inter_point = intersection(Line(segment), Line(*this));
-    if (segment.has_point(inter_point) && this->has_point(inter_point)) {
-        return true;
+    if (!Line(*this).has_intarsection_with(segment)) {
+        return false;
     }
-    return false;
+    Vector check_vector = Vector(this->origin, segment.point_0) + Vector(this->origin, segment.point_1);
+    if (scalar_product(check_vector, direction) < 0) {
+        return false;
+    }
+    return true;
 }
 
 std::ostream & Geometry::operator << (std::ostream & os, const Ray & ray) {
-    os << "origen: " << ray.origen << " direction :" << ray.direction;
+    os << "origin: " << ray.origin << " direction :" << ray.direction;
     return os;
 }
 
 std::istream & Geometry::operator >> (std::istream & is, Ray & ray) {
-    is >> ray.origen >> ray.direction;
+    is >> ray.origin >> ray.direction;
     return is;
 }
 
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 //Class Polygon: public Shape {};
-
+//private:
 Geometry::Polygon & Geometry::Polygon::define_points_cnt(const int & number_of_points) {
     this->points_cnt = number_of_points;
     this->points = new Point[number_of_points];
@@ -584,6 +601,7 @@ Geometry::Polygon & Geometry::Polygon::copy_points(const int & number_of_points,
     return *this;
 }
 
+//public: 
 Geometry::Polygon::Polygon() {
     this->define_points_cnt(1);
     this->points[0] = Point();
@@ -680,26 +698,26 @@ bool Geometry::Polygon::is_convex() const {
         return false;
     }
     scalar_t check_product = skew_product(Vector(this->points[this->points_cnt - 1], this->points[0]),
-        Vector(this->points[0], this->points[1]));
-    int check_index = 0;
-    for (; check_index < this->points_cnt - 2 && check_product == 0; check_index++) {
-        check_product = skew_product(Vector(this->points[check_index], this->points[check_index + 1]),
-            Vector(this->points[check_index + 1], this->points[check_index + 2]));
-    }
-    if (!check_product) {
-        return true;
-    }
-    for (int i = check_index; i < this->points_cnt - 2; ++i) {
-        if ((check_product * skew_product(Vector(this->points[i], this->points[i + 1]),
-            Vector(this->points[i + 1], this->points[i + 2]))) < 0) {
-            return false;
-        }
-    }
-    if ((check_product * skew_product(Vector(this->points[this->points_cnt - 2], this->points[this->points_cnt - 1]),
-        Vector(this->points[this->points_cnt - 1], this->points[0]))) < 0) {
+Vector(this->points[0], this->points[1]));
+int check_index = 0;
+for (; check_index < this->points_cnt - 2 && check_product == 0; check_index++) {
+    check_product = skew_product(Vector(this->points[check_index], this->points[check_index + 1]),
+        Vector(this->points[check_index + 1], this->points[check_index + 2]));
+}
+if (!check_product) {
+    return true;
+}
+for (int i = check_index; i < this->points_cnt - 2; ++i) {
+    if ((check_product * skew_product(Vector(this->points[i], this->points[i + 1]),
+        Vector(this->points[i + 1], this->points[i + 2]))) < 0) {
         return false;
     }
-    return true;
+}
+if ((check_product * skew_product(Vector(this->points[this->points_cnt - 2], this->points[this->points_cnt - 1]),
+    Vector(this->points[this->points_cnt - 1], this->points[0]))) < 0) {
+    return false;
+}
+return true;
 }
 
 bool Geometry::Polygon::has_self_intersection() const {
@@ -756,6 +774,104 @@ Geometry::scalar_t Geometry::area(const Polygon & polygon) {
     return area;
 }
 
+int Geometry::origin_index(const Point * points, const int points_cnt) {
+    // origin_index -- index of point that is in down left corner of polygon
+    int origin_index = 0;
+    for (int i = 1; i < points_cnt; ++i) {
+        if (points[i].radius_vector[1] < points[origin_index].radius_vector[1]) {
+            origin_index = i;
+        }
+        if (points[i].radius_vector[1] == points[origin_index].radius_vector[1] &&
+            points[i].radius_vector[0] < points[origin_index].radius_vector[0]) {
+            origin_index = i;
+        }
+    }
+    return origin_index;
+}
+
+int Geometry::compare_vectors(const void * vector_ptr_0, const void * vector_ptr_1) {
+    if ((*(Vector*)vector_ptr_0).is_zero() && (*(Vector*)vector_ptr_0).is_zero()) {
+        return 0;
+    }
+    if ((*(Vector*)vector_ptr_0).is_zero() && !(*(Vector*)vector_ptr_0).is_zero()) {
+        return -1;
+    }
+    if (!(*(Vector*)vector_ptr_0).is_zero() && (*(Vector*)vector_ptr_0).is_zero()) {
+        return 1;
+    }
+    scalar_t abs_vector_0 = abs(*(Vector*)vector_ptr_0);
+    scalar_t abs_vector_1 = abs(*(Vector*)vector_ptr_1);
+    double cos_0 = (*(Vector*)vector_ptr_0)[0] / abs_vector_0;
+    double cos_1 = (*(Vector*)vector_ptr_1)[0] / abs_vector_1;
+    if (cos_0 > cos_1) {
+        return -1;
+    }
+    if (cos_0 == cos_1) {
+        if (abs_vector_0 < abs_vector_1) {
+            return -1;
+        }
+        if (abs_vector_0 == abs_vector_1) {
+            return 0;
+        }
+        if (abs_vector_0 > abs_vector_1) {
+            return 1;
+        }
+    }
+    if (cos_0 < cos_1) {
+        return 1;
+    }
+}
+
+Geometry::Polygon Geometry::convex_hull(const Polygon & polygon) {
+    // origin_index -- index of point that is in down left corner of polygon
+    int origin_index = Geometry::origin_index(polygon.points, polygon.points_cnt);
+    Vector * sorted_vectors = new Vector[polygon.points_cnt];  //vector(origin, point[i])
+    for (int i = 0; i < polygon.points_cnt; ++i) {
+        sorted_vectors[i] = Vector(polygon.points[origin_index], polygon.points[i]);
+    }
+    qsort(sorted_vectors, polygon.points_cnt, sizeof(Vector), compare_vectors);
+
+    Vector ** good_vectors = new Vector*[polygon.points_cnt];
+    good_vectors[0] = sorted_vectors;
+    Vector ** last_good_vector = good_vectors;
+    int good_vectors_cnt = 1;
+    Vector * curr_vector = sorted_vectors;
+    for (int i = 1; i < polygon.points_cnt; ++i) {
+        if (!sorted_vectors[i].is_zero()) {
+            curr_vector = sorted_vectors + i;
+            break;
+        }
+    }
+
+    while (curr_vector != sorted_vectors + polygon.points_cnt - 1){
+        if (skew_product(*curr_vector - **last_good_vector, 
+            *(curr_vector + 1) - *curr_vector) > 0) {
+                last_good_vector[1] = curr_vector;
+                ++last_good_vector;
+                ++good_vectors_cnt;
+                ++curr_vector;
+        } else {
+            ++curr_vector;
+        }
+    }
+    if (skew_product(*curr_vector - **last_good_vector,
+        sorted_vectors[0] - *curr_vector) > 0) {
+        last_good_vector[1] = curr_vector;
+        ++last_good_vector;
+        ++good_vectors_cnt;
+    }
+    // we have good_ragius-vectors
+    Point * good_points = new Point[good_vectors_cnt];
+    for (int i = 0; i < good_vectors_cnt; ++i) {
+        good_points[i] = polygon.points[origin_index].radius_vector + good_vectors[i][0];
+    }
+    Polygon convex_hull(good_vectors_cnt, good_points);
+    delete[] good_vectors;
+    delete[] sorted_vectors;
+    delete[] good_points;
+    return convex_hull;
+}
+
 Geometry::Point Geometry::Polygon::operator [] (const int index) const {
     return this->points[index];
 }
@@ -772,18 +888,39 @@ Geometry::Polygon & Geometry::Polygon::move(const Vector & vector) {
 }
 
 bool Geometry::Polygon::has_point(const Point & point) const {
-    // The solution is presented for cases when polygon is convex;
-    // TODO: insert solution for cases when polygon is convex;
-    /*if (!this->is_convex) {
-        throw "There is no opportunity to study a polygon if it is convex";
-    }*/
-    scalar_t sum_area = 0;
-    for (int i = 0; i < this->points_cnt - 1; ++i) {
-        sum_area += abs(skew_product(Vector(point, this->points[i]), Vector(point, this->points[i + 1])));
+    for (int i = 0; i < this->points_cnt; ++i) {
+        if (Segment(this->points[i], this->points[i + 1]).has_point(point)) {
+            return true;
+        }
     }
-    sum_area += abs(skew_product(Vector(point, this->points[this->points_cnt - 1]), Vector(point, this->points[0])));
-    sum_area /= 2;
-    return area(*this) == sum_area;
+    if (Segment(this->points[this->points_cnt - 1], this->points[0]).has_point(point)) {
+        return true;
+    }
+
+    Ray check_ray(point, Vector(1000, 1));
+    bool ray_has_vertex = false;
+    do {
+        for (int i = 0; i < this->points_cnt; ++i) {
+            if (check_ray.has_point(this->points[i])) {
+                ray_has_vertex = true;
+                break;
+            }
+        }
+        if (ray_has_vertex) {
+            ++check_ray.direction[1];
+        }
+    } while (ray_has_vertex);
+
+    int intersections_cnt = 0;
+    for (int i = 0; i < this->points_cnt - 1; ++i) {
+        if (Segment(this->points[i], this->points[i + 1]).has_intarsection_with(check_ray)) {
+            ++intersections_cnt;
+        }
+    }
+    if (Segment(this->points[this->points_cnt - 1], this->points[0]).has_intarsection_with(check_ray)) {
+        ++intersections_cnt;
+    }
+    return (intersections_cnt % 2);
 }
 
 bool Geometry::Polygon::has_intarsection_with(const Segment & segment) const {

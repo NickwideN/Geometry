@@ -51,14 +51,15 @@ namespace Geometry {
         coordinate_t operator [] (const int index) const;
         coordinate_t & operator [] (const int index);
         friend scalar_t abs(const Vector & vector);
-        friend double sin_agl(const Vector & vector_0, const Vector & vector_1);
-        friend double cos_agl(const Vector & vector_0, const Vector & vector_1);
-        friend double tan_agl(const Vector & vector_0, const Vector & vector_1);
+        friend double sin(const Vector & vector_0, const Vector & vector_1);
+        friend double cos(const Vector & vector_0, const Vector & vector_1);
+        friend double tan(const Vector & vector_0, const Vector & vector_1);
         friend double agl(const Vector & vector_0, const Vector & vector_1);
         friend bool are_collinear(const Vector & vector_0, const Vector & vector_1);
         friend bool are_coincident(const Vector & vector_0, const Vector & vector_1);
         friend bool are_complanar(const Vector & vector_0, const Vector & vector_1, const Vector & vector_2); 
         friend bool are_co_directed(const Vector & vector_0, const Vector & vector_1);
+        bool is_zero();
         friend std::ostream & operator << (std::ostream & os, const Vector & vector);
         friend std::istream & operator >> (std::istream & is, Vector & vector);
     };
@@ -102,6 +103,10 @@ namespace Geometry {
         friend Point intersection(const Line & line_0, const Line & line_1);
         friend scalar_t distance_between(const Line & line_0, const Line & line_1);
         friend scalar_t area(const Polygon & polygon);
+        friend Polygon convex_hull(const Polygon & polygon);
+    private:
+        //function for convex_hull (class Polygon)
+        friend int origin_index(const Point * points, const int points_cnt);
     };
 
     class Segment : public Shape {
@@ -111,11 +116,12 @@ namespace Geometry {
     public:
         Segment();
         Segment(const Point & point_0, const Point & point_1);
-        Segment(const Point & origen, const Vector & direction, const scalar_t & length);
+        Segment(const Point & origin, const Vector & direction, const scalar_t & length);
 
         Segment & move(const Vector & vector) override;
         virtual bool has_point(const Point & point) const override;
         virtual bool has_intarsection_with(const Segment & segment) const override;
+        bool has_intarsection_with(const Ray & ray) const;
 
         friend scalar_t length(const Segment & segment);
         friend scalar_t distance_between(const Segment & segment_0, const Segment & segment_1);
@@ -132,11 +138,11 @@ namespace Geometry {
 
     class Line : public Shape {
     private:
-        Point origen;
+        Point origin;
         Vector direction;
     public:
         Line(const Point & point_0, const Point & point_1);
-        Line(const Point & origen, const Vector & vector, const char * name_vector = "direction"); // vector can be normal or direction
+        Line(const Point & origin, const Vector & vector, const char * name_vector = "direction"); // vector can be normal or direction
         Line(const coordinate_t & coefficient_of_x, const coordinate_t & coefficient_of_y, const coordinate_t & absolute_term);   // Ax + By + C = 0
         Line(const Segment & segmant);
         Line(const Ray & ray);
@@ -157,16 +163,15 @@ namespace Geometry {
 
         friend Segment;
         friend Point;
-
     };
 
     class Ray : public Shape {
     private:
-        Point origen;
+        Point origin;
         Vector direction;
     public:
-        Ray(const Point & origen, const Point & point_of_ray);
-        Ray(const Point & origen, const Vector & direction);
+        Ray(const Point & origin, const Point & point_of_ray);
+        Ray(const Point & origin, const Vector & direction);
         Ray & move(const Vector & vector) override;
         bool has_point(const Point & point) const override;
         bool has_intarsection_with(const Segment & segment) const override; 
@@ -176,6 +181,7 @@ namespace Geometry {
 
         friend Line;
         friend Point;
+        friend Polygon;
     };
 
     class Polygon : public Shape {
@@ -202,6 +208,13 @@ namespace Geometry {
         bool is_convex() const;
         bool has_self_intersection() const;
         bool is_star() const;
+    private:
+        //functions for convex_hull
+        friend int compare_vectors(const void * vector_ptr_0, const void * vector_ptr_1);
+        friend int origin_index(const Point * points, const int points_cnt);
+        
+    public:
+        friend Polygon convex_hull(const Polygon & polygon);
 
         Point operator [] (const int index) const;
         Point & operator [] (const int index);

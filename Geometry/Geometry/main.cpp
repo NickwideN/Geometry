@@ -109,7 +109,7 @@ int main() {
 }
 */
 // H   wrong
-
+/*
 int main() {
     int points_cnt;
     cin >> points_cnt;
@@ -120,8 +120,8 @@ int main() {
     getchar();
     return 0;
 }
-
-// I  wrong
+*/
+// I  //right
 /*
 int main() {
     int points_cnt;
@@ -150,6 +150,15 @@ int main() {
     return 0;
 }
 */
+
+// K
+int main() {
+
+
+    getchar();
+    getchar();
+    return 0;
+}
 
 // Checking Polygon
 /*
