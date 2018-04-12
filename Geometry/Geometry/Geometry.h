@@ -7,6 +7,7 @@
 #include<iostream>
 #include<cstring>    // strcmp
 #include<cmath>      // sqrt
+#include<algorithm>  // qsort
 
 namespace Geometry {
     typedef double coordinate_t;

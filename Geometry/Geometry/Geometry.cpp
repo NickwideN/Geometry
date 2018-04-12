@@ -823,6 +823,9 @@ int Geometry::compare_vectors(const void * vector_ptr_0, const void * vector_ptr
 }
 
 Geometry::Polygon Geometry::convex_hull(const Polygon & polygon) {
+    if (polygon.points_cnt < 4) {
+        return polygon;
+    }
     // origin_index -- index of point that is in down left corner of polygon
     int origin_index = Geometry::origin_index(polygon.points, polygon.points_cnt);
     Vector * sorted_vectors = new Vector[polygon.points_cnt];  //vector(origin, point[i])
