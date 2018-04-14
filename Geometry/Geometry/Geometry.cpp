@@ -671,7 +671,7 @@ Geometry::Polygon Geometry::Polygon::set_point_cnt(const int & point_cnt) {
     return new_polygon;
 }
 
-Geometry::Polygon & Geometry::Polygon::add_point(const Point & point) {
+Geometry::Polygon Geometry::Polygon::add_point(const Point & point) {
     Polygon new_poligon(this->points_cnt + 1);
     new_poligon.copy_points(this->points_cnt, this->points);
     new_poligon.points[new_poligon.points_cnt - 1] = point;
@@ -679,7 +679,7 @@ Geometry::Polygon & Geometry::Polygon::add_point(const Point & point) {
     return new_poligon;
 }
 
-Geometry::Polygon & Geometry::Polygon::remove_point() {
+Geometry::Polygon Geometry::Polygon::remove_point() {
     Polygon new_poligon(this->points_cnt - 1);
     new_poligon.copy_points(this->points_cnt - 1, this->points);
     delete[] this->points;
@@ -770,8 +770,7 @@ Geometry::scalar_t Geometry::area(const Polygon & polygon) {
         area += skew_product(polygon.points[i].radius_vector, polygon.points[i + 1].radius_vector);
     }
     area += skew_product(polygon.points[polygon.points_cnt - 1].radius_vector, polygon.points[0].radius_vector);
-    area = abs(area / 2);
-    return area;
+    return std::abs(area / 2);
 }
 
 int Geometry::origin_index(const Point * points, const int points_cnt) {
@@ -790,40 +789,49 @@ int Geometry::origin_index(const Point * points, const int points_cnt) {
 }
 
 int Geometry::compare_vectors(const void * vector_ptr_0, const void * vector_ptr_1) {
-    if ((*(Vector*)vector_ptr_0).is_zero() && (*(Vector*)vector_ptr_0).is_zero()) {
+    if ((*(Vector*)vector_ptr_0).is_zero() && (*(Vector*)vector_ptr_1).is_zero()) {
+        std::cout << "vector(" << *(Vector*)vector_ptr_0 << ") is zero and vector(" << *(Vector*)vector_ptr_1 << ") is zero\n";    ////////////////////////////////////////
         return 0;
     }
-    if ((*(Vector*)vector_ptr_0).is_zero() && !(*(Vector*)vector_ptr_0).is_zero()) {
+    if ((*(Vector*)vector_ptr_0).is_zero() && !((*(Vector*)vector_ptr_1).is_zero())) {
+        std::cout << "vector(" << *(Vector*)vector_ptr_0 << ") is zero and vector(" << *(Vector*)vector_ptr_1 << ") is not zero\n";    ////////////////////////////////////////
         return -1;
     }
-    if (!(*(Vector*)vector_ptr_0).is_zero() && (*(Vector*)vector_ptr_0).is_zero()) {
+    if (!((*(Vector*)vector_ptr_0).is_zero()) && (*(Vector*)vector_ptr_1).is_zero()) {
+        std::cout << "vector(" << *(Vector*)vector_ptr_0 << ") is not zero and vector(" << *(Vector*)vector_ptr_1 << ") is zero\n";    ////////////////////////////////////////
         return 1;
     }
-    scalar_t abs_vector_0 = abs(*(Vector*)vector_ptr_0);
-    scalar_t abs_vector_1 = abs(*(Vector*)vector_ptr_1);
-    double cos_0 = (*(Vector*)vector_ptr_0)[0] / abs_vector_0;
-    double cos_1 = (*(Vector*)vector_ptr_1)[0] / abs_vector_1;
-    if (cos_0 > cos_1) {
+    scalar_t skew_prod = skew_product(*(Vector*)vector_ptr_0, *(Vector*)vector_ptr_1);
+    if (skew_prod > 0) {
+        std::cout << "cos_vector(" << *(Vector*)vector_ptr_0 << ") > cos_vector( " << *(Vector*)vector_ptr_1 << "):\n";    ////////////////////////////////////////
         return -1;
     }
-    if (cos_0 == cos_1) {
-        if (abs_vector_0 < abs_vector_1) {
+    if (skew_prod == 0) {
+        std::cout << "cos_vector(" << *(Vector*)vector_ptr_0 << ") == cos_vector( "<< *(Vector*)vector_ptr_1 <<"):\n";    ////////////////////////////////////////
+        scalar_t abs_vector_0 = (*(Vector*)vector_ptr_0)[0] * (*(Vector*)vector_ptr_0)[0] + (*(Vector*)vector_ptr_0)[1] * (*(Vector*)vector_ptr_0)[1];
+        scalar_t abs_vector_1 = (*(Vector*)vector_ptr_1)[0] * (*(Vector*)vector_ptr_1)[0] + (*(Vector*)vector_ptr_1)[1] * (*(Vector*)vector_ptr_1)[1];
+        if (abs_vector_0 < abs_vector_1) { 
+            std::cout << "\tabs(" << *(Vector*)vector_ptr_0 << ") < abs(" << *(Vector*)vector_ptr_1  << ")\n";    ////////////////////////////////////////
             return -1;
         }
         if (abs_vector_0 == abs_vector_1) {
+            std::cout << "\tabs(" << *(Vector*)vector_ptr_0 << ") == abs(" << *(Vector*)vector_ptr_1 << ")\n";    ////////////////////////////////////////
+
             return 0;
         }
         if (abs_vector_0 > abs_vector_1) {
+            std::cout << "\tabs(" << *(Vector*)vector_ptr_0 << ") > abs(" << *(Vector*)vector_ptr_1 << ")\n";    ////////////////////////////////////////
             return 1;
         }
     }
-    if (cos_0 < cos_1) {
+    if (skew_prod < 0) {
+        std::cout << "cos_vector(" << *(Vector*)vector_ptr_0 << ") < cos_vector( " << *(Vector*)vector_ptr_1 << "):\n";    ////////////////////////////////////////
         return 1;
     }
 }
 
 Geometry::Polygon Geometry::convex_hull(const Polygon & polygon) {
-    if (polygon.points_cnt < 4) {
+    if (polygon.points_cnt < 2) {
         return polygon;
     }
     // origin_index -- index of point that is in down left corner of polygon
@@ -831,9 +839,12 @@ Geometry::Polygon Geometry::convex_hull(const Polygon & polygon) {
     Vector * sorted_vectors = new Vector[polygon.points_cnt];  //vector(origin, point[i])
     for (int i = 0; i < polygon.points_cnt; ++i) {
         sorted_vectors[i] = Vector(polygon.points[origin_index], polygon.points[i]);
+        std::cout << "not_sorted_vector_" << i << " = " << sorted_vectors[i] << '\n';//////////////////////////////////////
     }
     qsort(sorted_vectors, polygon.points_cnt, sizeof(Vector), compare_vectors);
-
+    for (int i = 0; i < polygon.points_cnt; ++i) {
+        std::cout << "sorted_vector_" << i << " = " << sorted_vectors[i] << '\n';//////////////////////////////////////////////
+    }
     Vector ** good_vectors = new Vector*[polygon.points_cnt];
     good_vectors[0] = sorted_vectors;
     Vector ** last_good_vector = good_vectors;
@@ -845,16 +856,29 @@ Geometry::Polygon Geometry::convex_hull(const Polygon & polygon) {
             break;
         }
     }
-
-    while (curr_vector != sorted_vectors + polygon.points_cnt - 1){
-        if (skew_product(*curr_vector - **last_good_vector, 
-            *(curr_vector + 1) - *curr_vector) > 0) {
-                last_good_vector[1] = curr_vector;
-                ++last_good_vector;
-                ++good_vectors_cnt;
-                ++curr_vector;
-        } else {
-            ++curr_vector;
+    Vector * next_vector = curr_vector + 1;
+    if (curr_vector->is_zero()) {
+        return Polygon(1, polygon.points[origin_index]);
+    }
+    while (next_vector != sorted_vectors + polygon.points_cnt) {
+        if (skew_product(*curr_vector - **last_good_vector,
+            *next_vector - *curr_vector) > 0) {
+            last_good_vector[1] = curr_vector;
+            ++next_vector;
+            curr_vector = next_vector - 1;
+            ++last_good_vector;
+            ++good_vectors_cnt;
+        }
+        else {
+            if (last_good_vector == good_vectors) {
+                ++next_vector;
+                curr_vector = next_vector - 1;
+            }
+            else {
+                --last_good_vector;
+                --good_vectors_cnt;
+                curr_vector = last_good_vector[1];
+            }
         }
     }
     scalar_t tmp_skew_product = skew_product(*curr_vector - **last_good_vector,

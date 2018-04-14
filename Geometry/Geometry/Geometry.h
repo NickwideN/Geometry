@@ -47,7 +47,7 @@ namespace Geometry {
         friend scalar_t operator * (const Vector & vector_0, const Vector & vector_1);
         friend scalar_t scalar_product(const Vector & vector_0, const Vector & vector_1);
         friend Vector vector_product(const Vector & vector_0, const Vector & vector_1);
-        friend coordinate_t skew_product(const Vector & vector_0, const Vector & vector_1);
+        friend scalar_t skew_product(const Vector & vector_0, const Vector & vector_1);
         friend Vector normal_vector(const Vector & vector);
         coordinate_t operator [] (const int index) const;
         coordinate_t & operator [] (const int index);
@@ -202,8 +202,8 @@ namespace Geometry {
         Polygon & operator = (const Polygon & other);
         Polygon & operator = (Polygon && other);
         Polygon set_point_cnt(const int & point_cnt);
-        Polygon & add_point(const Point & point);
-        Polygon & remove_point();
+        Polygon add_point(const Point & point);
+        Polygon remove_point();
         int get_points_cnt() const;
         friend scalar_t area(const Polygon & polygon);
         bool is_convex() const;
