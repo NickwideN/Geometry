@@ -764,7 +764,7 @@ bool Geometry::Polygon::is_star() const {
     return false;
 }
 
-Geometry::scalar_t Geometry::area(const Polygon & polygon) {
+Geometry::area_t Geometry::area(const Polygon & polygon) {
     scalar_t area = 0;
     for (int i = 0; i < polygon.points_cnt - 1; ++i) {
         area += skew_product(polygon.points[i].radius_vector, polygon.points[i + 1].radius_vector);

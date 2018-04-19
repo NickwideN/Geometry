@@ -2,6 +2,8 @@
 //                          README.md is here: https://github.com/NickwideN/Geometry
 //-------------------------------------------------------------------------------------------------
 
+
+// убрать все cout,  конечная реализация в /K,\\convex_hull 
 #ifndef _NickwideN_Geometry_H
 #define _NickwideN_Geometry_H
 #include<iostream>
@@ -12,6 +14,7 @@
 namespace Geometry {
     typedef double coordinate_t;
     typedef double scalar_t;
+    typedef long double area_t;
     const static int DIMENTION = 2;
     constexpr static coordinate_t default_value = 0;
     class Point;
@@ -103,7 +106,7 @@ namespace Geometry {
         friend bool are_skew(const Line & line_0, const Line & line_1);
         friend Point intersection(const Line & line_0, const Line & line_1);
         friend scalar_t distance_between(const Line & line_0, const Line & line_1);
-        friend scalar_t area(const Polygon & polygon);
+        friend area_t area(const Polygon & polygon);
         friend Polygon convex_hull(const Polygon & polygon);
     private:
         //function for convex_hull (class Polygon)
@@ -205,7 +208,7 @@ namespace Geometry {
         Polygon add_point(const Point & point);
         Polygon remove_point();
         int get_points_cnt() const;
-        friend scalar_t area(const Polygon & polygon);
+        friend area_t area(const Polygon & polygon);
         bool is_convex() const;
         bool has_self_intersection() const;
         bool is_star() const;

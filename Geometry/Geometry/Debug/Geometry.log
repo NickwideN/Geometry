@@ -1,7 +1,8 @@
 ﻿  Geometry.cpp
   Создание кода...
 d:\с++\geometry\geometry\geometry\geometry.cpp(831): warning C4715: Geometry::compare_vectors: значение возвращается не при всех путях выполнения
-  Пропуск... (изменения не обнаружены)
+  Компиляция...
   main.cpp
+  Создание кода...
   Geometry.vcxproj -> D:\С++\Geometry\Geometry\Debug\Geometry.exe
   Geometry.vcxproj -> D:\С++\Geometry\Geometry\Debug\Geometry.pdb (Partial PDB)
